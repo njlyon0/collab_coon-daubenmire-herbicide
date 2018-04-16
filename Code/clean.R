@@ -234,7 +234,7 @@ herb <- subset(daub.v8, daub.v8$Herbicide.Treatment == "Con" |
 herb$Treatment <- gsub("IGB", "GB", herb$Treatment)
 
 # Going to do some fancy footwork to make a grouping variable for eventual plotting
-herb$Composite.Variable <- paste0(herb$Treatment, "-", herb$Herbicide.Treatment)
+herb$Composite.Variable <- paste0(herb$Year, "-", herb$Herbicide.Treatment)
 sort(unique(herb$Composite.Variable))
 
 # And kick Sterner (STE) because of its weirdo burn/herbicide timing
