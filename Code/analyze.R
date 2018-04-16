@@ -32,7 +32,37 @@ setwd("~/Documents/School/1. Iowa State/Collaborations/_Daubenmire Herbicide Bit
 # Clear environment of other stuff
 rm(list = ls())
 
+# Pull in the dataset
+sns <- read.csv("./Data/snsdata.csv")
+
+# Make sure year is considered a factor
+str(sns$Year)
+sns$Year <- as.factor(sns$Year)
+str(sns$Year)
+
+# Re-level the factors too though
+unique(sns$Herbicide.Treatment)
+sns$Herbicide.Treatment <- factor(as.character(sns$Herbicide.Treatment), levels = c("Con", "Spr", "SnS"))
+unique(sns$Herbicide.Treatment)
+
+# Further separate into cattle-grazed restorations (CGRs) and un-grazed restorations (UGRs)
+cgr <- subset(sns, sns$Treatment == "GB")
+ugr <- subset(sns, sns$Treatment == "None")
+
+# Plotting shortcuts
+yr.labs <- c("2014", "2015", "2016", "2017")
+sns.labs <- c("Con", "Spr", "SnS")
+yr.colors <- c("2014" = "#969696", "2015" = "#f768a1", "2016" = "#dd3497",
+               "2017" = "#ae017e", "2018" = "#7a0177")
+cgr.colors <- c("Con" = "#d73027", "Spr" = "#f46d43", "SnS" = "#fdae61") # shades of red
+ugr.colors <- c("Con" = "#4575b4", "Spr" = "#74add1", "SnS" = "#abd9e9") # shades of blue
+cgr.ns.color <- "#fdae61"
+ugr.ns.color <- "#abd9e9"
+panel.labs <- c("i", "ii")
+dodge <- position_dodge(width = 0.5)
+
 # Helpful custom functions
+  ## Simplify advanced.procD.lm output and do multiple comparison adjustment (run as wrapper)
 simp.procD <- function(adv.procD.obj, p.dig = 4, crit.dig = 4, sig.thresh = 0.05){
   ## adv.procD.obj = object of a geomorph::advanced.procD.lm function
   ## p.dig = the number of digits you want the p value rounded to
@@ -94,7 +124,10 @@ simp.procD <- function(adv.procD.obj, p.dig = 4, crit.dig = 4, sig.thresh = 0.05
   results3$Sig <- ifelse(test = results3$Sig >= 0.05, yes = " ",
                          no = ifelse(test = results3$Sig >= 0, yes = ".",
                                      no = ifelse(test = results3$Sig >= -0.01, yes = "**", no = "***")))
-   ## Viewer discretion is advized when using this bonus column
+  ## Viewer discretion is advized when using this bonus column
+  
+  # Just in case you don't want to look in the guts of this function to see what * vs. ** means:
+  message("Sig codes: P - Alpha < -0.01 '***' | ≥ -0.01 '**' | ≥ 0 '.' | ≥ 0.05 ' '")
   
   # Get rid of the bothersome and distracting row numbering
   row.names(results3) <- NULL
@@ -102,40 +135,27 @@ simp.procD <- function(adv.procD.obj, p.dig = 4, crit.dig = 4, sig.thresh = 0.05
   # And spit out the result
   return(results3)
   
-  # Just in case you don't want to look in the guts of this function to see what * vs. ** means:
-  message("Sig codes: P - Alpha < -0.01 '***' | ≥ -0.01 '**' | ≥ 0 '.' | ≥ 0.05 ' '")
-  
 }
 
-# Pull in the dataset
-sns <- read.csv("./Data/snsdata.csv")
-
-# Make sure year is considered a factor
-str(sns$Year)
-sns$Year <- as.factor(sns$Year)
-str(sns$Year)
-
-# Re-level the factors too though
-levels(sns$Herbicide.Treatment)
-sns$Herbicide.Treatment <- as.character(sns$Herbicide.Treatment)
-str(sns$Herbicide.Treatment)
-sns$Herbicide.Treatment <- factor(sns$Herbicide.Treatment, levels = c("Con", "Spr", "SnS"))
-levels(sns$Herbicide.Treatment)
-
-# Further separate into cattle-grazed restorations (CGRs) and un-grazed restorations (UGRs)
-cgr <- subset(sns, sns$Treatment == "GB")
-ugr <- subset(sns, sns$Treatment == "None")
-
-# Plotting shortcuts
-yr.labs <- c("2014", "2015", "2016", "2017")
-sns.labs <- c("Con", "Spr", "SnS")
-yr.colors <- c("2014" = "#969696", "2015" = "#f768a1", "2016" = "#dd3497",
-               "2017" = "#ae017e", "2018" = "#7a0177")
-cgr.colors <- c("Con" = "#d73027", "Spr" = "#f46d43", "SnS" = "#fdae61") # shades of red
-ugr.colors <- c("Con" = "#4575b4", "Spr" = "#74add1", "SnS" = "#abd9e9") # shades of blue
-cgr.ns.color <- "#fdae61"
-ugr.ns.color <- "#abd9e9"
-dodge <- position_dodge(width = 0.5)
+  ## Get's min and max values from a supplied vector, good for setting plot limits
+minmax <- function(x, dig = 0, slack = 10){
+  ## x = vector for checking (can be concatenated from multiple sources but must be single object)
+  ## dig = digits to round min and max to (default is 0 to yield integers)
+  ## slack = how much room you want on either end of the true min and max?
+  
+  # Get and round minimum and maximums
+  min.val <- round(min(x), digits = dig)
+  max.val <- round(max(x), digits = dig)
+  
+  # Get 'em into a single value with slack accounted for
+  bounds <- c((min.val - slack), (max.val + slack))
+  
+  # Make sure it can never get below 0
+  bounds[bounds < 0] <- 0
+  
+  return(bounds)
+  
+}
 
 # RESEARCH QUESTIONS ####
 
@@ -151,13 +171,13 @@ dodge <- position_dodge(width = 0.5)
 # Analysis
 procD.lm(CSG ~ Herbicide.Treatment * Year, data = cgr) # NS
 procD.lm(CSG ~ Herbicide.Treatment * Year, data = ugr) # trt = sig
-advanced.procD.lm(CSG ~ Herbicide.Treatment + Year, ~ Year, ~ Herbicide.Treatment, data = ugr)
+simp.procD(advanced.procD.lm(CSG ~ Herbicide.Treatment + Year, ~ Year, ~ Herbicide.Treatment, data = ugr))
   ## Con = A | Spr = AB | SnS = B
 
 # Get summary stats for plotting
 cgr.csg.pltdf <- summarySE(data = cgr, measurevar = "CSG", groupvars = c("Herbicide.Treatment"))
 ugr.csg.pltdf <- summarySE(data = ugr, measurevar = "CSG", groupvars = c("Herbicide.Treatment"))
-csg.lims <- c(10, 50)
+csg.lims <- minmax(c(cgr.csg.pltdf[,3], ugr.csg.pltdf[,3]))
 
 # Plots
 cgr.csg.plt <- ggplot(cgr.csg.pltdf, aes(Herbicide.Treatment, CSG, color = Herbicide.Treatment)) +
@@ -183,7 +203,7 @@ ugr.csg.plt <- ggplot(ugr.csg.pltdf, aes(Herbicide.Treatment, CSG, color = Herbi
         legend.position = "none", legend.title = element_blank()); ugr.csg.plt
 
 # Save it.
-plot_grid(cgr.csg.plt, ugr.csg.plt, labels = c("", "**"), nrow = 1, ncol = 2)
+plot_grid(cgr.csg.plt, ugr.csg.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/CSG.pdf",plot = last_plot())
 
 ##  -----------------------------------------  ##
@@ -192,13 +212,13 @@ ggplot2::ggsave("./Graphs/CSG.pdf",plot = last_plot())
 # Analysis
 procD.lm(WSG ~ Herbicide.Treatment * Year, data = cgr) # NS
 procD.lm(WSG ~ Herbicide.Treatment * Year, data = ugr) # trt = sig
-advanced.procD.lm(WSG ~ Herbicide.Treatment + Year, ~ Year, ~ Herbicide.Treatment, data = ugr)
-  ## Con = A | Spr = A | SnS = B
+simp.procD(advanced.procD.lm(WSG ~ Herbicide.Treatment + Year, ~ Year, ~ Herbicide.Treatment, data = ugr))
+  ## Con = A | Spr = B | SnS = C
 
 # Get summary stats for plotting
 cgr.wsg.pltdf <- summarySE(data = cgr, measurevar = "WSG", groupvars = c("Herbicide.Treatment"))
 ugr.wsg.pltdf <- summarySE(data = ugr, measurevar = "WSG", groupvars = c("Herbicide.Treatment"))
-wsg.lims <- c(0, 25)
+wsg.lims <- minmax(c(cgr.wsg.pltdf[,3], ugr.wsg.pltdf[,3]))
 
 # Plots
 cgr.wsg.plt <- ggplot(cgr.wsg.pltdf, aes(Herbicide.Treatment, WSG, color = Herbicide.Treatment)) +
@@ -224,24 +244,24 @@ ugr.wsg.plt <- ggplot(ugr.wsg.pltdf, aes(Herbicide.Treatment, WSG, color = Herbi
         legend.position = "none", legend.title = element_blank()); ugr.wsg.plt
 
 # Save it.
-plot_grid(cgr.wsg.plt, ugr.wsg.plt, labels = c("", "**"), nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/WSG.pdf",plot = last_plot())
+plot_grid(cgr.wsg.plt, ugr.wsg.plt, labels = panel.labs, nrow = 1, ncol = 2)
+ggplot2::ggsave("./Graphs/WSG.pdf", plot = last_plot())
 
 ##  -----------------------------------------  ##
             # Fescue ####
 ##  -----------------------------------------  ##
 # Analysis
 procD.lm(Fescue ~ Herbicide.Treatment * Year, data = cgr) # yr = sig
-advanced.procD.lm(Fescue ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr)
+simp.procD(advanced.procD.lm(Fescue ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr))
   ## 14 = A | 15 = B | 16 = B | 17 = B
 
 procD.lm(Fescue ~ Herbicide.Treatment * Year, data = ugr) # yr = marginally sig
-advanced.procD.lm(Fescue ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = ugr)
+simp.procD(advanced.procD.lm(Fescue ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = ugr))
   ## 14 = A | 15 = A | 16 = A | 17 = B
 
 cgr.fsc.pltdf <- summarySE(data = cgr, measurevar = "Fescue", groupvars = c("Year", "Herbicide.Treatment"))
 ugr.fsc.pltdf <- summarySE(data = ugr, measurevar = "Fescue", groupvars = c("Year", "Herbicide.Treatment"))
-fsc.lims <- c(0, 65)
+fsc.lims <- minmax(c(cgr.fsc.pltdf[,4], ugr.fsc.pltdf[,4]))
 
 # Plot
 cgr.fsc.plt <- ggplot(cgr.fsc.pltdf, aes(Herbicide.Treatment, Fescue, color = Year)) +
@@ -264,7 +284,7 @@ ugr.fsc.plt <- ggplot(ugr.fsc.pltdf, aes(Herbicide.Treatment, Fescue, color = Ye
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.fsc.plt
 
-plot_grid(cgr.fsc.plt, ugr.fsc.plt, labels = c("**", ""), nrow = 1, ncol = 2)
+plot_grid(cgr.fsc.plt, ugr.fsc.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Fescue.pdf", plot = last_plot())
 
 ##  -----------------------------------------  ##
@@ -272,18 +292,20 @@ ggplot2::ggsave("./Graphs/Fescue.pdf", plot = last_plot())
 ##  -----------------------------------------  ##
 # Analysis
 procD.lm(Seedmix ~ Herbicide.Treatment * Year, data = cgr) # year = marginally sig
+simp.procD(advanced.procD.lm(Seedmix ~ Herbicide.Treatment * Year, ~ 1, ~ Year, data = cgr))
+  ## 2014 = A | 2015 = AB | 2016 = B | 2017 = B
 procD.lm(Seedmix ~ Herbicide.Treatment * Year, data = ugr) # NS
 
 cgr.smx.pltdf <- summarySE(data = cgr, measurevar = "Seedmix", groupvars = c("Herbicide.Treatment"))
 ugr.smx.pltdf <- summarySE(data = ugr, measurevar = "Seedmix", groupvars = c("Herbicide.Treatment"))
-smx.lims <- c(0, 0.15)
+smx.lims <- minmax(c(cgr.smx.pltdf[,3], ugr.smx.pltdf[,3]), slack = 0.1)
 
 # Plots
 cgr.smx.plt <- ggplot(cgr.smx.pltdf, aes(Herbicide.Treatment, Seedmix, color = Herbicide.Treatment)) +
   geom_errorbar(aes(ymin = Seedmix - se, ymax = Seedmix + se), width = 0.3, size = 1, position = dodge) +
   geom_point(position = 'identity', size = 2.5) +
   xlab("Grazed") +
-  scale_y_continuous("Seedmix Threshold", limits = smx.lims) +
+  scale_y_continuous("Seedmix Proportion", limits = smx.lims) +
   scale_color_manual(values = cgr.colors) +
   scale_x_discrete(limits = sns.labs, labels = sns.labs) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
@@ -294,7 +316,7 @@ ugr.smx.plt <- ggplot(ugr.smx.pltdf, aes(Herbicide.Treatment, Seedmix, color = H
   geom_errorbar(aes(ymin = Seedmix - se, ymax = Seedmix + se), width = 0.3, size = 1, position = dodge) +
   geom_point(position = 'identity', size = 2.5) +
   xlab("Un-Grazed") +
-  scale_y_continuous("Seedmix Threshold", limits = smx.lims) +
+  scale_y_continuous("Seedmix Proportion", limits = smx.lims) +
   scale_color_manual(values = ugr.colors) +
   scale_x_discrete(limits = sns.labs, labels = sns.labs) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
@@ -302,21 +324,21 @@ ugr.smx.plt <- ggplot(ugr.smx.pltdf, aes(Herbicide.Treatment, Seedmix, color = H
         legend.position = "none", legend.title = element_blank()); ugr.smx.plt
 
 # Save it.
-plot_grid(cgr.smx.plt, ugr.smx.plt, labels = c("", ""), nrow = 1, ncol = 2)
+plot_grid(cgr.smx.plt, ugr.smx.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Seedmix.pdf", plot = last_plot())
 
 ##  -----------------------------------------  ##
             # Forbs ####
 ##  -----------------------------------------  ##
 procD.lm(Forbs ~ Herbicide.Treatment * Year, data = cgr) # yr & trt = sig
-frb.posthoc <- advanced.procD.lm(Forbs ~ Herbicide.Treatment * Year, ~ 1, ~ as.factor(paste(cgr$Year, cgr$Herbicide.Treatment)), data = cgr)
-sig.reduced(frb.posthoc) # not parsed as of right now
+simp.procD(advanced.procD.lm(Forbs ~ Herbicide.Treatment * Year, ~ 1, ~ Composite.Variable, data = cgr))
+  ## Only marginal significance for some pairwise comparisons (after adjustment)
 
 procD.lm(Forbs ~ Herbicide.Treatment * Year, data = ugr) # NS
 
 cgr.frb.pltdf <- summarySE(data = cgr, measurevar = "Forbs", groupvars = c("Herbicide.Treatment", "Year"))
 ugr.frb.pltdf <- summarySE(data = ugr, measurevar = "Forbs", groupvars = c("Herbicide.Treatment", "Year"))
-frb.lims <- c(5, 70)
+frb.lims <- minmax(c(cgr.frb.pltdf[,4], ugr.frb.pltdf[,4]))
 
 # Plots
 cgr.frb.plt <- ggplot(cgr.frb.pltdf, aes(Herbicide.Treatment, Forbs, color = Year)) +
@@ -340,7 +362,7 @@ ugr.frb.plt <- ggplot(ugr.frb.pltdf, aes(Herbicide.Treatment, Forbs, color = Yea
         legend.position = "none", legend.title = element_blank()); ugr.frb.plt
 
 # Save it.
-plot_grid(cgr.frb.plt, ugr.frb.plt, labels = c("**", ""), nrow = 1, ncol = 2)
+plot_grid(cgr.frb.plt, ugr.frb.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Forbs.pdf", plot = last_plot())
 
 ##  -----------------------------------------  ##
@@ -348,16 +370,16 @@ ggplot2::ggsave("./Graphs/Forbs.pdf", plot = last_plot())
 ##  -----------------------------------------  ##
 # Analysis
 procD.lm(Legumes ~ Herbicide.Treatment * Year, data = cgr) # yr = marginally sig
-advanced.procD.lm(Legumes ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr)
-  ## 14 = A | 15 = A | 16 = A | 17 = B
+simp.procD(advanced.procD.lm(Legumes ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr))
+  ## 14 = A | 15 = B | 16 = A | 17 = B
 
 procD.lm(Legumes ~ Herbicide.Treatment * Year, data = ugr) # interxn = SIG
-lgm.posthoc <- advanced.procD.lm(Legumes ~ Herbicide.Treatment * Year, ~ 1, ~ as.factor(paste(ugr$Year, ugr$Herbicide.Treatment)), data = ugr)
-sig.reduced(lgm.posthoc) # not parsed as of right now
+simp.procD(advanced.procD.lm(Legumes ~ Herbicide.Treatment * Year, ~ 1, ~ Composite.Variable, data = ugr))
+  ## Some marginal significance after adjustment
 
 cgr.lgm.pltdf <- summarySE(data = cgr, measurevar = "Legumes", groupvars = c("Year", "Herbicide.Treatment"))
 ugr.lgm.pltdf <- summarySE(data = ugr, measurevar = "Legumes", groupvars = c("Year", "Herbicide.Treatment"))
-lgm.lims <- c(0, 65)
+lgm.lims <- minmax(c(cgr.lgm.pltdf[,4], ugr.lgm.pltdf[,4]))
 
 # Plot
 cgr.lgm.plt <- ggplot(cgr.lgm.pltdf, aes(Herbicide.Treatment, Legumes, color = Year)) +
@@ -380,7 +402,7 @@ ugr.lgm.plt <- ggplot(ugr.lgm.pltdf, aes(Herbicide.Treatment, Legumes, color = Y
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.lgm.plt
 
-plot_grid(cgr.lgm.plt, ugr.lgm.plt, labels = c("", "**"), nrow = 1, ncol = 2)
+plot_grid(cgr.lgm.plt, ugr.lgm.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Legumes.pdf", plot = last_plot())
 
 ##  -----------------------------------------  ##
@@ -388,16 +410,16 @@ ggplot2::ggsave("./Graphs/Legumes.pdf", plot = last_plot())
 ##  -----------------------------------------  ##
 # Analysis
 procD.lm(Woody ~ Herbicide.Treatment * Year, data = cgr) # trt = marginally sig
-advanced.procD.lm(Woody ~ Herbicide.Treatment + Year, ~ 1, ~ Herbicide.Treatment, data = cgr)
+simp.procD(advanced.procD.lm(Woody ~ Herbicide.Treatment + Year, ~ 1, ~ Herbicide.Treatment, data = cgr))
   ## Con = AB | Spr = A | SnS = B
 
 procD.lm(Woody ~ Herbicide.Treatment * Year, data = ugr) # yr = sig
-advanced.procD.lm(Woody ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = ugr)
+simp.procD(advanced.procD.lm(Woody ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = ugr))
   ## 14 = A | 15 = A | 16 = A | 17 = B
 
 cgr.wdy.pltdf <- summarySE(data = cgr, measurevar = "Woody", groupvars = c("Herbicide.Treatment"))
 ugr.wdy.pltdf <- summarySE(data = ugr, measurevar = "Woody", groupvars = c("Year"))
-wdy.lims <- c(0, 5)
+wdy.lims <-minmax(c(cgr.wdy.pltdf[,3], ugr.wdy.pltdf[,3]))
 
 # Plot
 cgr.wdy.plt <- ggplot(cgr.wdy.pltdf, aes(Herbicide.Treatment, Woody, color = Herbicide.Treatment)) +
@@ -420,21 +442,21 @@ ugr.wdy.plt <- ggplot(ugr.wdy.pltdf, aes(Year, Woody, color = Year)) +
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.wdy.plt
 
-plot_grid(cgr.wdy.plt, ugr.wdy.plt, labels = c("**", ""), nrow = 1, ncol = 2)
+plot_grid(cgr.wdy.plt, ugr.wdy.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Woody.pdf", plot = last_plot())
 
 ##  -----------------------------------------  ##
           # Bare Cover ####
 ##  -----------------------------------------  ##
 procD.lm(Bare ~ Herbicide.Treatment * Year, data = cgr) # yr = sig
-advanced.procD.lm(Bare ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr)
-## 14 = A | 15 = B | 16 = A | 17 = A
+simp.procD(advanced.procD.lm(Bare ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr))
+  ## 14 = A | 15 = B | 16 = A | 17 = A
 
 procD.lm(Bare ~ Herbicide.Treatment * Year, data = ugr) # NS
 
 cgr.bar.pltdf <- summarySE(data = cgr, measurevar = "Bare", groupvars = c("Year"))
 ugr.bar.pltdf <- summarySE(data = ugr, measurevar = "Bare", groupvars = c("Year"))
-bar.lims <- c(0, 60)
+bar.lims <- minmax(c(cgr.bar.pltdf[,3], ugr.bar.pltdf[,3]))
 
 # Plot
 cgr.bar.plt <- ggplot(cgr.bar.pltdf, aes(Year, Bare, color = Year)) +
@@ -457,7 +479,7 @@ ugr.bar.plt <- ggplot(ugr.bar.pltdf, aes(Year, Bare, color = Year)) +
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.bar.plt
 
-plot_grid(cgr.bar.plt, ugr.bar.plt, labels = c("**", ""), nrow = 1, ncol = 2)
+plot_grid(cgr.bar.plt, ugr.bar.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Bare.pdf", plot = last_plot())
 
 ##  -----------------------------------------  ##
@@ -465,14 +487,14 @@ ggplot2::ggsave("./Graphs/Bare.pdf", plot = last_plot())
 ##  -----------------------------------------  ##
 
 procD.lm(Litter ~ Herbicide.Treatment * Year, data = cgr) # interxn = sig
-ltr.posthoc <- advanced.procD.lm(Legumes ~ Herbicide.Treatment * Year, ~ 1, ~ as.factor(paste(cgr$Year, cgr$Herbicide.Treatment)), data = cgr)
-sig.reduced(ltr.posthoc) # not parsed as of right now
+simp.procD(advanced.procD.lm(Legumes ~ Herbicide.Treatment * Year, ~ 1, ~ Composite.Variable, data = cgr))
+  ## Some marginal significance after adjustment
 
 procD.lm(Litter ~ Herbicide.Treatment * Year, data = ugr) # NS
 
 cgr.ltr.pltdf <- summarySE(data = cgr, measurevar = "Litter", groupvars = c("Year", "Herbicide.Treatment"))
 ugr.ltr.pltdf <- summarySE(data = ugr, measurevar = "Litter", groupvars = c("Year"))
-ltr.lims <- c(0, 100)
+ltr.lims <- minmax(c(cgr.ltr.pltdf[,4], ugr.ltr.pltdf[,3]))
 
 # Plot
 cgr.ltr.plt <- ggplot(cgr.ltr.pltdf, aes(Herbicide.Treatment, Litter, color = Year)) +
@@ -495,7 +517,7 @@ ugr.ltr.plt <- ggplot(ugr.ltr.pltdf, aes(Year, Litter, color = Year)) +
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.ltr.plt
 
-plot_grid(cgr.ltr.plt, ugr.ltr.plt, labels = c("**", ""), nrow = 1, ncol = 2)
+plot_grid(cgr.ltr.plt, ugr.ltr.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Litter.pdf", plot = last_plot())
 
 ##  -----------------------------------------  ##
@@ -507,7 +529,7 @@ procD.lm(Robel ~ Herbicide.Treatment * Year, data = ugr) # NS
 
 cgr.rbl.pltdf <- summarySE(data = cgr, measurevar = "Robel", groupvars = c("Herbicide.Treatment"))
 ugr.rbl.pltdf <- summarySE(data = ugr, measurevar = "Robel", groupvars = c("Herbicide.Treatment"))
-rbl.lims <- c(0, 10)
+rbl.lims <- minmax(c(cgr.rbl.pltdf[,3], ugr.rbl.pltdf[,3]), slack = 1)
 
 # Plot
 cgr.rbl.plt <- ggplot(cgr.rbl.pltdf, aes(Herbicide.Treatment, Robel, color = Herbicide.Treatment)) +
@@ -530,7 +552,7 @@ ugr.rbl.plt <- ggplot(ugr.rbl.pltdf, aes(Herbicide.Treatment, Robel, color = Her
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.rbl.plt
 
-plot_grid(cgr.rbl.plt, ugr.rbl.plt, labels = c("", ""), nrow = 1, ncol = 2)
+plot_grid(cgr.rbl.plt, ugr.rbl.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Robel.pdf", plot = last_plot())
 
 ##  -----------------------------------------  ##
@@ -542,7 +564,7 @@ procD.lm(Panic ~ Herbicide.Treatment * Year, data = ugr) # NS
 
 cgr.pnc.pltdf <- summarySE(data = cgr, measurevar = "Panic", groupvars = c("Herbicide.Treatment"))
 ugr.pnc.pltdf <- summarySE(data = ugr, measurevar = "Panic", groupvars = c("Herbicide.Treatment"))
-pnc.lims <- c(0, 1)
+pnc.lims <- minmax(c(cgr.pnc.pltdf[,3], ugr.pnc.pltdf[,3]), slack = 0.1)
 
 # Plot
 cgr.pnc.plt <- ggplot(cgr.pnc.pltdf, aes(Herbicide.Treatment, Panic, color = Herbicide.Treatment)) +
@@ -565,23 +587,23 @@ ugr.pnc.plt <- ggplot(ugr.pnc.pltdf, aes(Herbicide.Treatment, Panic, color = Her
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.pnc.plt
 
-plot_grid(cgr.pnc.plt, ugr.pnc.plt, labels = c("", ""), nrow = 1, ncol = 2)
+plot_grid(cgr.pnc.plt, ugr.pnc.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Panic.pdf", plot = last_plot())
 
 ##  -----------------------------------------  ##
       # Litter Depth (cm) ####
 ##  -----------------------------------------  ##
 procD.lm(LitDep ~ Herbicide.Treatment * Year, data = cgr) # yr = sig
-advanced.procD.lm(LitDep ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr)
+simp.procD(advanced.procD.lm(LitDep ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr))
   ## 14 = A | 15 = B | 16 = A | 17 = A
 
 procD.lm(LitDep ~ Herbicide.Treatment * Year, data = ugr) # yr = sig
-advanced.procD.lm(LitDep ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = ugr)
+simp.procD(advanced.procD.lm(LitDep ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = ugr))
   ## 14 = A | 15 = A | 16 = AB | 17 = B
 
 cgr.ltrdp.pltdf <- summarySE(data = cgr, measurevar = "LitDep", groupvars = c("Year"))
 ugr.ltrdp.pltdf <- summarySE(data = ugr, measurevar = "LitDep", groupvars = c("Year"))
-ltrdp.lims <- c(0, 75)
+ltrdp.lims <- minmax(c(cgr.ltrdp.pltdf[,3], ugr.ltrdp.pltdf[,3]), slack = 5)
 
 # Plot
 cgr.ltrdp.plt <- ggplot(cgr.ltrdp.pltdf, aes(Year, LitDep, color = Year)) +
@@ -604,7 +626,7 @@ ugr.ltrdp.plt <- ggplot(ugr.ltrdp.pltdf, aes(Year, LitDep, color = Year)) +
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.ltrdp.plt
 
-plot_grid(cgr.ltrdp.plt, ugr.ltrdp.plt, labels = c("**", "**"), nrow = 1, ncol = 2)
+plot_grid(cgr.ltrdp.plt, ugr.ltrdp.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/LitDep.pdf", plot = last_plot())
 
 # END ####
