@@ -63,18 +63,17 @@ dodge <- position_dodge(width = 0.5)
 
 # Helpful custom functions
   ## Simplify advanced.procD.lm output and do multiple comparison adjustment (run as wrapper)
-simp.procD <- function(adv.procD.obj, p.dig = 4, crit.dig = 4, sig.thresh = 0.05){
+simp.procD <- function(adv.procD.obj, p.dig = 4, crit.dig = 4){
   ## adv.procD.obj = object of a geomorph::advanced.procD.lm function
   ## p.dig = the number of digits you want the p value rounded to
   ## thresh = the upper threshold of the p values you want to keep
-  ## sig.thresh = What critical point do you want to start from (pre-multiple comparison adjustment)?
   
   # Get just the p values 
-  ## You can refer to the whole output later to get relevant stats when you know what you're looking for
   pairs <- adv.procD.obj$P.means.dist
+  ## You can refer to the whole output later to get relevant stats when you know what you're looking for
   
   # Want to ditch either the top diagonal or the bottom diagonal of the matrix of p-values
-  ## These are redundant with the opposite triangle of the matrix
+  ## These are the mirror image of the opposite triangle of the matrix
   ## I've arbitrarily chosen to eliminate the lower triangle, but it doesn't matter
   pairs[lower.tri(pairs, diag = T)] <- NA
   
@@ -106,8 +105,8 @@ simp.procD <- function(adv.procD.obj, p.dig = 4, crit.dig = 4, sig.thresh = 0.05
   rank <- c(1:length(results3$Comparisons)) # assign them a rank based on this order
   
   # Modify the critical point based on the rank of each sequential p value
-  results3$Alpha.Pt <- round( with(results3, ( (sig.thresh / (length(results3$Comparisons) + 1 - rank)) ) ), 
-                              digits = crit.dig)
+  results3$Crit.Pt <- round( with(results3, ( (0.05 / (length(results3$Comparisons) + 1 - rank)) ) ), 
+                             digits = crit.dig)
   ## Sequential bonferroni is calculated as show above, but in plain English it is like this:
   ## Each comparison gets it's own, sequential, critical point
   ## This is determined by dividing the standard critical point (0.05) by
@@ -118,16 +117,21 @@ simp.procD <- function(adv.procD.obj, p.dig = 4, crit.dig = 4, sig.thresh = 0.05
   ### And 0.05 / 1 = 0.05 (duh)
   
   # Though you probably want to know if the stuff is significant at a glance
-  results3$Sig <- results3$P.Values - results3$Alpha.Pt
+  results3$"P/Crit" <- results3$P.Values / results3$Crit.Pt
   
   # Now get the ranges of "significance" to be reduced to qualitative bits
-  results3$Sig <- ifelse(test = results3$Sig >= 0.05, yes = " ",
-                         no = ifelse(test = results3$Sig >= 0, yes = ".",
-                                     no = ifelse(test = results3$Sig >= -0.01, yes = "**", no = "***")))
+  results3$Sig <- ifelse(test = results3$"P/Crit" > 2, yes = " ",
+                         no = ifelse(test = results3$"P/Crit" > 0.2, yes = ".",
+                                     no = ifelse(test = results3$"P/Crit" > 0.02, yes = "*",
+                                                 no = ifelse(test = results3$"P/Crit" > 0.002, yes = "**", no = "***"))))
   ## Viewer discretion is advized when using this bonus column
   
   # Just in case you don't want to look in the guts of this function to see what * vs. ** means:
-  message("Sig codes: P - Alpha < -0.01 '***' | ≥ -0.01 '**' | ≥ 0 '.' | ≥ 0.05 ' '")
+  message("Sig codes: P / Crit > 2 = ''
+          0.2 < P/C ≤ 2 = '.'
+          0.02 < P/C ≤ 0.2 = '*'
+          0.002 < P/C ≤ 0.02 = '**'
+          P/C ≤ 0.002 = '***'")
   
   # Get rid of the bothersome and distracting row numbering
   row.names(results3) <- NULL
@@ -136,7 +140,6 @@ simp.procD <- function(adv.procD.obj, p.dig = 4, crit.dig = 4, sig.thresh = 0.05
   return(results3)
   
 }
-
   ## Get's min and max values from a supplied vector, good for setting plot limits
 minmax <- function(x, dig = 0, slack = 10){
   ## x = vector for checking (can be concatenated from multiple sources but must be single object)
