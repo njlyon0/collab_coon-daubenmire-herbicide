@@ -27,8 +27,8 @@ library(ggplot2); library(cowplot) # Plotting
 library(Rmisc) # get summary values for plotting
 
 # Set working directory (Also, "Session" menu to "Set Working Directory" works)
-setwd("~/Documents/School/1. Iowa State/Collaborations/_Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
-
+setwd("~/Documents/School/1. Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
+                            
 # Clear environment of other stuff
 rm(list = ls())
 
