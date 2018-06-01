@@ -13,7 +13,7 @@
   ## % seed-mix of TOTAL = % forbs of TOTAL * % seed-mix of FORBS
 
 # Required libraries
-library(plyr); library(stringr)
+library(plyr); library(stringr); library(ggplot2)
 
 # Set working directory (Also, "Session" menu to "Set Working Directory" works)
 setwd("~/Documents/School/1. Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
@@ -39,19 +39,14 @@ sort(unique(daub$Sdmx.for.Calc))
 
 # Now get a dataframe of the bare minimum of stuff we need
 sdmx <- data.frame(
-  Quadrat.ID <- 1:nrow(daub),
-  Forbs <- daub$Forbs,
-  Sdmx.of.Forbs <- daub$Seed_mix,
-  Sdmx.for.Calc <- daub$Sdmx.for.Calc,
-  Sdmx.of.Total.TRUE <- daub$Violets)
+  Quadrat.ID = 1:nrow(daub),
+  Forbs = daub$Forbs,
+  Sdmx.of.Forbs = daub$Seed_mix,
+  Sdmx.for.Calc = daub$Sdmx.for.Calc,
+  Sdmx.of.Total.TRUE = daub$Violets)
   ## We recorded % seed-mix of TOTAL under the "Violets" heading because adding a new field to the
   ## Trimble units we were using was too difficult to integrate into the older data
   ## Less than ideal, but well-documented internally
-
-# Weird column names are distracting, fix that
-colnames(sdmx)
-colnames(sdmx) <- c("Quadrat.ID", "Forbs", "Sdmx.of.Forbs", "Sdmx.for.Calc", "Sdmx.of.Total.TRUE")
-colnames(sdmx)
 
 # Make the TRUE % seed-mix of TOTAL into a number (you'll want it later)
 sort(unique(sdmx$Sdmx.of.Total.TRUE))
@@ -61,6 +56,9 @@ sort(unique(sdmx$Sdmx.of.Total.TRUE))
 # Do the calculation
 sdmx$Sdmx.of.Total.CALC <- sdmx$Forbs * sdmx$Sdmx.for.Calc
 sort(unique(sdmx$Sdmx.of.Total.CALC))
+
+# Save these values as a new column and continue
+sdmx$Sdmx.of.Total.RAW.CALC <- sdmx$Sdmx.of.Total.CALC
 
 # Now modify the derived values to fit into our pseudo-continuous category system
 sdmx$Sdmx.of.Total.CALC[sdmx$Sdmx.of.Total.CALC > 0 & sdmx$Sdmx.of.Total.CALC <= 1] <- 1
@@ -80,119 +78,74 @@ count(sdmx$Accuracy)
 (227 / nrow(sdmx)) * 100
   ## wrong for 15% of the quadrats
 
+# Save the number wrong (you'll want it later)
+wrng.qdrt <- 227
+
 # What if we back-calculated to a threshold rather than specific values?
   ## Would likely increase accuracy, but let's test that
 
 ##  ---------------------------------------------------------------------------------------------  ##
-                        # Threshold Evaluation (25%) ####
+                        # Threshold Evaluation  ####
 ##  ---------------------------------------------------------------------------------------------  ##
-# Get a new dataframe for threshold testing so you only have to go back to here if problems happen
-sdmx2 <- sdmx
+# Because we'll do this iteratively for many potential thresholds, let's write a function
+num.wrong <- function(calc.vec, true.vec, thresh){
+  ## calc.vec = the vector for calculated quadrat-level values
+  ## true.vec = the vector for true quadrat-level values
+  ## thresh = the Daubenmire recording category to be used as a threshold
+  
+  
+  # Modify the calculation back to 
+  calc.vec[calc.vec >= 0 & calc.vec <= thresh] <- 0
+  calc.vec[calc.vec > thresh & calc.vec <= 100] <- 1
+  
+  # Do the same for the TRUE % seed-mix of TOTAL
+  true.vec[true.vec >= 0 & true.vec <= thresh] <- 0
+  true.vec[true.vec > thresh & true.vec <= 100] <- 1
+  
+  # Check fidelity between calculated and true vectors at that threshold
+  accuracy <- true.vec == calc.vec
+  acc.df <- plyr::count(accuracy)
+  
+  # Get just the frequency of disagreement between the true and calculated vectors
+  number.wrong <- as.numeric(subset(acc.df, acc.df$x == "FALSE")$freq)
+  
+  return(number.wrong)
+  
+}
 
-# Convert the calculated % seed-mix of TOTAL to a threshold
-sdmx2$Sdmx.of.Total.CALC[sdmx2$Sdmx.of.Total.CALC >= 0 & sdmx2$Sdmx.of.Total.CALC <= 16] <- 0
-sdmx2$Sdmx.of.Total.CALC[sdmx2$Sdmx.of.Total.CALC > 16 & sdmx2$Sdmx.of.Total.CALC <= 100] <- 1
+# Now get the number wrong for all possible thresholds
+wrng.05 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.RAW.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 3)
+wrng.25 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.RAW.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 16)
+wrng.50 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.RAW.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 38)
+wrng.75 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.RAW.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 63)
+wrng.95 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.RAW.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 86)
 
-# Do the same for the TRUE % seed-mix of TOTAL
-sdmx2$Sdmx.of.Total.TRUE[sdmx2$Sdmx.of.Total.TRUE >= 0 & sdmx2$Sdmx.of.Total.TRUE <= 16] <- 0
-sdmx2$Sdmx.of.Total.TRUE[sdmx2$Sdmx.of.Total.TRUE > 16 & sdmx2$Sdmx.of.Total.TRUE <= 100] <- 1
+# What are those values?
+wrng.qdrt; wrng.05; wrng.25; wrng.50; wrng.75; wrng.95
 
-# Check accuracy on a per-quadrat basis
-sdmx2$Accuracy <- sdmx2$Sdmx.of.Total.TRUE == sdmx2$Sdmx.of.Total.CALC
-count(sdmx2$Accuracy)
+# Just for fun; stuff this into a dataframe and plot it so you can see how error changes with threshold
+thresh.fit <- data.frame(
+  Threshold = c("Qdrt", "5%", "25%", "50%", "75%", "95%"),
+  Number.Wrong = c(wrng.qdrt, wrng.05, wrng.25, wrng.50, wrng.75, 0),
+  Total.Quadrats = rep.int(nrow(sdmx), 6))
 
-# What's that in % format?
-(39 / nrow(sdmx2)) * 100
-  ## Wrong only 2.6% of the time!
+# Calculate the percent wrong for each condition
+thresh.fit$Percent.Wrong <- (thresh.fit$Number.Wrong / thresh.fit$Total.Quadrats) * 100
 
-# Let's test all possible thresholds though to see if there's a *best* one to be using
+# Do some minor housekeeping of the dataframe
+levels(thresh.fit$Threshold)
+thresh.fit$Threshold <- factor(thresh.fit$Threshold,
+                               levels = c("Qdrt", "5%", "25%", "50%", "75%", "95%"))
+levels(thresh.fit$Threshold)
 
-##  ---------------------------------------------------------------------------------------------  ##
-                      # Threshold Evaluation (5%) ####
-##  ---------------------------------------------------------------------------------------------  ##
-# Get a new dataframe for threshold testing so you only have to go back to here if problems happen
-sdmx3 <- sdmx
+# Now plot the accuracy!
+ggplot(thresh.fit, aes(x = Threshold, y = Percent.Wrong, fill = Threshold)) +
+  geom_bar(stat = 'identity') +
+  labs(x = "Conversion Threshold", y = "% Wrong") +
+  scale_fill_manual(values = sp::bpy.colors(length(thresh.fit$Threshold)))+
+  theme(legend.position = "none")
 
-# Convert the calculated % seed-mix of TOTAL to a threshold
-sdmx3$Sdmx.of.Total.CALC[sdmx3$Sdmx.of.Total.CALC >= 0 & sdmx3$Sdmx.of.Total.CALC <= 3] <- 0
-sdmx3$Sdmx.of.Total.CALC[sdmx3$Sdmx.of.Total.CALC > 3 & sdmx3$Sdmx.of.Total.CALC <= 100] <- 1
-
-# Do the same for the TRUE % seed-mix of TOTAL
-sdmx3$Sdmx.of.Total.TRUE[sdmx3$Sdmx.of.Total.TRUE >= 0 & sdmx3$Sdmx.of.Total.TRUE <= 3] <- 0
-sdmx3$Sdmx.of.Total.TRUE[sdmx3$Sdmx.of.Total.TRUE > 3 & sdmx3$Sdmx.of.Total.TRUE <= 100] <- 1
-
-# Check accuracy on a per-quadrat basis
-sdmx3$Accuracy <- sdmx3$Sdmx.of.Total.TRUE == sdmx3$Sdmx.of.Total.CALC
-count(sdmx3$Accuracy)
-
-# What's that in % format?
-(170 / nrow(sdmx3)) * 100
-
-##  ---------------------------------------------------------------------------------------------  ##
-                          # Threshold Evaluation (50%) ####
-##  ---------------------------------------------------------------------------------------------  ##
-# Get a new dataframe for threshold testing so you only have to go back to here if problems happen
-sdmx4 <- sdmx
-
-# Convert the calculated % seed-mix of TOTAL to a threshold
-sdmx4$Sdmx.of.Total.CALC[sdmx4$Sdmx.of.Total.CALC >= 0 & sdmx4$Sdmx.of.Total.CALC <= 38] <- 0
-sdmx4$Sdmx.of.Total.CALC[sdmx4$Sdmx.of.Total.CALC > 38 & sdmx4$Sdmx.of.Total.CALC <= 100] <- 1
-
-# Do the same for the TRUE % seed-mix of TOTAL
-sdmx4$Sdmx.of.Total.TRUE[sdmx4$Sdmx.of.Total.TRUE >= 0 & sdmx4$Sdmx.of.Total.TRUE <= 38] <- 0
-sdmx4$Sdmx.of.Total.TRUE[sdmx4$Sdmx.of.Total.TRUE > 38 & sdmx4$Sdmx.of.Total.TRUE <= 100] <- 1
-
-# Check accuracy on a per-quadrat basis
-sdmx4$Accuracy <- sdmx4$Sdmx.of.Total.TRUE == sdmx4$Sdmx.of.Total.CALC
-count(sdmx4$Accuracy)
-
-# What's that in % format?
-(20 / nrow(sdmx4)) * 100
-
-##  ---------------------------------------------------------------------------------------------  ##
-                      # Threshold Evaluation (75%) ####
-##  ---------------------------------------------------------------------------------------------  ##
-# Get a new dataframe for threshold testing so you only have to go back to here if problems happen
-sdmx5 <- sdmx
-
-# Convert the calculated % seed-mix of TOTAL to a threshold
-sdmx5$Sdmx.of.Total.CALC[sdmx5$Sdmx.of.Total.CALC >= 0 & sdmx5$Sdmx.of.Total.CALC <= 63] <- 0
-sdmx5$Sdmx.of.Total.CALC[sdmx5$Sdmx.of.Total.CALC > 63 & sdmx5$Sdmx.of.Total.CALC <= 100] <- 1
-
-# Do the same for the TRUE % seed-mix of TOTAL
-sdmx5$Sdmx.of.Total.TRUE[sdmx5$Sdmx.of.Total.TRUE >= 0 & sdmx5$Sdmx.of.Total.TRUE <= 63] <- 0
-sdmx5$Sdmx.of.Total.TRUE[sdmx5$Sdmx.of.Total.TRUE > 63 & sdmx5$Sdmx.of.Total.TRUE <= 100] <- 1
-
-# Check accuracy on a per-quadrat basis
-sdmx5$Accuracy <- sdmx5$Sdmx.of.Total.TRUE == sdmx5$Sdmx.of.Total.CALC
-count(sdmx5$Accuracy)
-
-# What's that in % format?
-(2 / nrow(sdmx5)) * 100
-
-##  ---------------------------------------------------------------------------------------------  ##
-                      # Threshold Evaluation (95%) ####
-##  ---------------------------------------------------------------------------------------------  ##
-# Get a new dataframe for threshold testing so you only have to go back to here if problems happen
-sdmx6 <- sdmx
-
-# Convert the calculated % seed-mix of TOTAL to a threshold
-sdmx6$Sdmx.of.Total.CALC[sdmx6$Sdmx.of.Total.CALC >= 0 & sdmx6$Sdmx.of.Total.CALC <= 86] <- 0
-sdmx6$Sdmx.of.Total.CALC[sdmx6$Sdmx.of.Total.CALC > 86 & sdmx6$Sdmx.of.Total.CALC <= 100] <- 1
-
-# Do the same for the TRUE % seed-mix of TOTAL
-sdmx6$Sdmx.of.Total.TRUE[sdmx6$Sdmx.of.Total.TRUE >= 0 & sdmx6$Sdmx.of.Total.TRUE <= 86] <- 0
-sdmx6$Sdmx.of.Total.TRUE[sdmx6$Sdmx.of.Total.TRUE > 86 & sdmx6$Sdmx.of.Total.TRUE <= 100] <- 1
-
-# Check accuracy on a per-quadrat basis
-sdmx6$Accuracy <- sdmx6$Sdmx.of.Total.TRUE == sdmx6$Sdmx.of.Total.CALC
-count(sdmx6$Accuracy)
-
-# never wrong. So not doing the 98 one
-
-##  ---------------------------------------------------------------------------------------------  ##
-                  # Threshold Accuracy Comparison ####
-##  ---------------------------------------------------------------------------------------------  ##
+# Seems like either 25% or 50% is a nice middle-ground between relevance and accuracy
 
 
 

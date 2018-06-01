@@ -164,7 +164,7 @@ daub.v3$Seedmix.of.Total <- as.numeric(daub.v3$Seedmix.of.Total)
   ## Assign to either 0 or 1 so that an average of each patch will calculate a proportion
 sort(unique(daub.v3$Seedmix.of.Total)) # should have all sorts of weirdo decimals
 daub.v3$Seedmix.of.Total[daub.v3$Seedmix.of.Total >= 0 & daub.v3$Seedmix.of.Total <= 16] <- 0
-daub.v3$Seedmix.of.Total[daub.v3$Seedmix.of.Total >= 17 & daub.v3$Seedmix.of.Total <= 100] <- 1
+daub.v3$Seedmix.of.Total[daub.v3$Seedmix.of.Total > 16 & daub.v3$Seedmix.of.Total <= 100] <- 1
 sort(unique(daub.v3$Seedmix.of.Total)) # should have only 0 or 1
 
 ##  ---------------------------------------------------------------------------------------------  ##
