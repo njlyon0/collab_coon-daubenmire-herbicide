@@ -42,8 +42,13 @@ cgr.colors <- c("Con" = "#d73027", "Spr" = "#f46d43", "SnS" = "#fdae61") # shade
 ugr.colors <- c("Con" = "#4575b4", "Spr" = "#74add1", "SnS" = "#abd9e9") # shades of blue
 cgr.ns.color <- "#fdae61"
 ugr.ns.color <- "#abd9e9"
-panel.labs <- c("i", "ii")
+panel.labs <- c("A)", "B)")
 dodge <- position_dodge(width = 0.5)
+cgr.vlines <- geom_vline(xintercept = c(2014.4, 2014.5, 2014.6, 2017.4), linetype = c(1, 2, 3, 1))
+ugr.vlines <- geom_vline(xintercept = c(2014.5, 2014.6), linetype = c(2, 3))
+pref.theme <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                    panel.background = element_blank(), axis.line = element_line(colour = "black"), 
+                    legend.title = element_blank())
 
 # Helpful custom functions
   ## Simplify advanced.procD.lm output and do multiple comparison adjustment (run as wrapper)
@@ -144,14 +149,16 @@ minmax <- function(x, dig = 0, slack = 10){
   
 }
 
-
 ##  ---------------------------------------------------------------------------------------------  ##
-                        # Cool Season Grasses ####
+                         # Cool Season Grasses ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
-procD.lm(CSG ~ Herbicide.Treatment * Year, data = cgr) # NS
-procD.lm(CSG ~ Herbicide.Treatment * Year, data = ugr) # trt = sig
-simp.procD(advanced.procD.lm(CSG ~ Herbicide.Treatment + Year, ~ Year, ~ Herbicide.Treatment, data = ugr))
+procD.lm(CSG ~ Herbicide.Treatment * Year, data = cgr) # interxn = NS
+procD.lm(CSG ~ Herbicide.Treatment + Year, data = cgr) # NS
+
+procD.lm(CSG ~ Herbicide.Treatment * Year, data = ugr) # interxn = NS
+procD.lm(CSG ~ Herbicide.Treatment + Year, data = ugr) # treat = sig, year = marginal
+simp.procD(advanced.procD.lm(CSG ~ Herbicide.Treatment + Year, ~ 1, ~ Herbicide.Treatment, data = ugr))
   ## Con = A | Spr = AB | SnS = B
 
 # Get summary stats for plotting
@@ -167,9 +174,7 @@ cgr.csg.plt <- ggplot(cgr.csg.pltdf, aes(Herbicide.Treatment, CSG, color = Herbi
   scale_y_continuous("CSG % Cover", limits = csg.lims) +
   scale_color_manual(values = cgr.colors) +
   scale_x_discrete(limits = sns.labs, labels = sns.labs) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); cgr.csg.plt
+  pref.theme + theme(legend.position = "none"); cgr.csg.plt
 
 ugr.csg.plt <- ggplot(ugr.csg.pltdf, aes(Herbicide.Treatment, CSG, color = Herbicide.Treatment)) +
   geom_errorbar(aes(ymin = CSG - se, ymax = CSG + se), width = 0.3, size = 1, position = dodge) +
@@ -178,22 +183,23 @@ ugr.csg.plt <- ggplot(ugr.csg.pltdf, aes(Herbicide.Treatment, CSG, color = Herbi
   scale_y_continuous("CSG % Cover", limits = csg.lims) +
   scale_color_manual(values = ugr.colors) +
   scale_x_discrete(limits = sns.labs, labels = sns.labs) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); ugr.csg.plt
+  pref.theme + theme(legend.position = "none"); ugr.csg.plt
 
-# Save it.
+# Save it
 plot_grid(cgr.csg.plt, ugr.csg.plt, labels = panel.labs, nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/CSG.pdf",plot = last_plot())
+ggplot2::ggsave("./Graphs/CSG.pdf", plot = last_plot())
 
-##  -----------------------------------------  ##
-     # Warm Season Grasses ####
-##  -----------------------------------------  ##
+##  ---------------------------------------------------------------------------------------------  ##
+                        # Warm Season Grasses ####
+##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
-procD.lm(WSG ~ Herbicide.Treatment * Year, data = cgr) # NS
-procD.lm(WSG ~ Herbicide.Treatment * Year, data = ugr) # trt = sig
-simp.procD(advanced.procD.lm(WSG ~ Herbicide.Treatment + Year, ~ Year, ~ Herbicide.Treatment, data = ugr))
-  ## Con = A | Spr = B | SnS = C
+procD.lm(WSG ~ Herbicide.Treatment * Year, data = cgr) # interxn = NS
+procD.lm(WSG ~ Herbicide.Treatment + Year, data = cgr) # NS
+
+procD.lm(WSG ~ Herbicide.Treatment * Year, data = ugr) # interxn = marginal
+procD.lm(WSG ~ Herbicide.Treatment + Year, data = ugr) # treat = sig
+simp.procD(advanced.procD.lm(WSG ~ Herbicide.Treatment + Year, ~ 1, ~ Herbicide.Treatment, data = ugr))
+  ## Con = A | Spr = A | SnS = B
 
 # Get summary stats for plotting
 cgr.wsg.pltdf <- summarySE(data = cgr, measurevar = "WSG", groupvars = c("Herbicide.Treatment"))
@@ -208,9 +214,7 @@ cgr.wsg.plt <- ggplot(cgr.wsg.pltdf, aes(Herbicide.Treatment, WSG, color = Herbi
   scale_y_continuous("WSG % Cover", limits = wsg.lims) +
   scale_color_manual(values = cgr.colors) +
   scale_x_discrete(limits = sns.labs, labels = sns.labs) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); cgr.wsg.plt
+  pref.theme + theme(legend.position = "none"); cgr.wsg.plt
 
 ugr.wsg.plt <- ggplot(ugr.wsg.pltdf, aes(Herbicide.Treatment, WSG, color = Herbicide.Treatment)) +
   geom_errorbar(aes(ymin = WSG - se, ymax = WSG + se), width = 0.3, size = 1, position = dodge) +
@@ -219,175 +223,183 @@ ugr.wsg.plt <- ggplot(ugr.wsg.pltdf, aes(Herbicide.Treatment, WSG, color = Herbi
   scale_y_continuous("WSG % Cover", limits = wsg.lims) +
   scale_color_manual(values = ugr.colors) +
   scale_x_discrete(limits = sns.labs, labels = sns.labs) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); ugr.wsg.plt
+  pref.theme + theme(legend.position = "none"); ugr.wsg.plt
 
 # Save it.
 plot_grid(cgr.wsg.plt, ugr.wsg.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/WSG.pdf", plot = last_plot())
 
-##  -----------------------------------------  ##
-            # Fescue ####
-##  -----------------------------------------  ##
+##  ---------------------------------------------------------------------------------------------  ##
+                                # Fescue ####
+##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
-procD.lm(Fescue ~ Herbicide.Treatment * Year, data = cgr) # yr = sig
+procD.lm(Fescue ~ Herbicide.Treatment * Year, data = cgr) # interxn = NS
+procD.lm(Fescue ~ Herbicide.Treatment + Year, data = cgr) # year = sig
 simp.procD(advanced.procD.lm(Fescue ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr))
-  ## 14 = A | 15 = B | 16 = B | 17 = B
+  ## 14 = A | 15 = AB | 16 = B | 17 = B
 
-procD.lm(Fescue ~ Herbicide.Treatment * Year, data = ugr) # yr = marginally sig
+procD.lm(Fescue ~ Herbicide.Treatment * Year, data = ugr) # interxn = NS
+procD.lm(Fescue ~ Herbicide.Treatment + Year, data = ugr) # year = marginal
 simp.procD(advanced.procD.lm(Fescue ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = ugr))
-  ## 14 = A | 15 = A | 16 = A | 17 = B
+  ## 14 = A | 15 = AB | 16 = AB | 17 = B
 
 cgr.fsc.pltdf <- summarySE(data = cgr, measurevar = "Fescue", groupvars = c("Year", "Herbicide.Treatment"))
+cgr.fsc.pltdf$Year <- as.numeric(as.character(cgr.fsc.pltdf$Year))
 ugr.fsc.pltdf <- summarySE(data = ugr, measurevar = "Fescue", groupvars = c("Year", "Herbicide.Treatment"))
-fsc.lims <- minmax(c(cgr.fsc.pltdf[,4], ugr.fsc.pltdf[,4]))
+ugr.fsc.pltdf$Year <- as.numeric(as.character(ugr.fsc.pltdf$Year))
+fsc.lims <- minmax(c(cgr.fsc.pltdf[,4], ugr.fsc.pltdf[,4]), slack = 15)
 
 # Plot
-cgr.fsc.plt <- ggplot(cgr.fsc.pltdf, aes(Herbicide.Treatment, Fescue, color = Year)) +
-  geom_errorbar(aes(ymin = Fescue - se, ymax = Fescue + se), width = 0.3, size = 1, position = dodge) +
-  geom_point(stat = 'identity', size = 2, position = dodge) +
+cgr.fsc.plt <- ggplot(cgr.fsc.pltdf, aes(Year, Fescue, color = Herbicide.Treatment)) +
+  geom_line(aes(group = Herbicide.Treatment), size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2.5, position = dodge) +
+  geom_errorbar(aes(ymax = Fescue + se, ymin = Fescue - se), position = dodge, width = 0.3) +
   scale_y_continuous("Fescue % Cover", limits = fsc.lims) +
-  xlab("Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); cgr.fsc.plt
+  scale_x_continuous(breaks = seq(2014, 2018, 1)) +
+  scale_color_manual(values = cgr.colors) +
+  cgr.vlines + pref.theme + 
+  theme(legend.position = c(0.65, 0.9)); cgr.fsc.plt
 
-ugr.fsc.plt <- ggplot(ugr.fsc.pltdf, aes(Herbicide.Treatment, Fescue, color = Year)) +
-  geom_errorbar(aes(ymin = Fescue - se, ymax = Fescue + se), width = 0.3, size = 1, position = dodge) +
-  geom_point(stat = 'identity', size = 2, position = dodge) +
+ugr.fsc.plt <- ggplot(ugr.fsc.pltdf, aes(Year, Fescue, color = Herbicide.Treatment)) +
+  geom_line(aes(group = Herbicide.Treatment), size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2.5, position = dodge) +
+  geom_errorbar(aes(ymax = Fescue + se, ymin = Fescue - se), position = dodge, width = 0.3) +
   scale_y_continuous("Fescue % Cover", limits = fsc.lims) +
-  xlab("Un-Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); ugr.fsc.plt
+  scale_x_continuous(breaks = seq(2014, 2018, 1)) +
+  scale_color_manual(values = ugr.colors) +
+  ugr.vlines + pref.theme + 
+  theme(legend.position = c(0.65, 0.9)); ugr.fsc.plt
 
 plot_grid(cgr.fsc.plt, ugr.fsc.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Fescue.pdf", plot = last_plot())
 
-##  -----------------------------------------  ##
-      # Seedmix Threshhold ####
-##  -----------------------------------------  ##
+##  ---------------------------------------------------------------------------------------------  ##
+                        # Seedmix Threshhold ####
+##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
-procD.lm(Seedmix ~ Herbicide.Treatment * Year, data = cgr) # year = marginally sig
-simp.procD(advanced.procD.lm(Seedmix ~ Herbicide.Treatment * Year, ~ 1, ~ Year, data = cgr))
-  ## 2014 = A | 2015 = AB | 2016 = B | 2017 = B
-procD.lm(Seedmix ~ Herbicide.Treatment * Year, data = ugr) # NS
+procD.lm(Seedmix ~ Herbicide.Treatment * Year, data = cgr) # interxn = NS
+procD.lm(Seedmix ~ Herbicide.Treatment + Year, data = cgr) # year = sig
+simp.procD(advanced.procD.lm(Seedmix ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr))
+  ## 2014 = A | 2015 = AB | 2016 = BC | 2017 = C
 
-cgr.smx.pltdf <- summarySE(data = cgr, measurevar = "Seedmix", groupvars = c("Herbicide.Treatment"))
-ugr.smx.pltdf <- summarySE(data = ugr, measurevar = "Seedmix", groupvars = c("Herbicide.Treatment"))
-smx.lims <- minmax(c(cgr.smx.pltdf[,3], ugr.smx.pltdf[,3]), slack = 0.1)
+procD.lm(Seedmix ~ Herbicide.Treatment * Year, data = ugr) # interxn = NS
+procD.lm(Seedmix ~ Herbicide.Treatment + Year, data = ugr) # NS
+
+cgr.smx.pltdf <- summarySE(data = cgr, measurevar = "Seedmix", groupvars = c("Year"))
+cgr.smx.pltdf$Year <- as.numeric(as.character(cgr.smx.pltdf$Year))
+ugr.smx.pltdf <- summarySE(data = ugr, measurevar = "Seedmix", groupvars = c("Year"))
+ugr.smx.pltdf$Year <- as.numeric(as.character(ugr.smx.pltdf$Year))
+smx.lims <- minmax(c(cgr.smx.pltdf[,3], ugr.smx.pltdf[,3]), slack = 0.15)
 
 # Plots
-cgr.smx.plt <- ggplot(cgr.smx.pltdf, aes(Herbicide.Treatment, Seedmix, color = Herbicide.Treatment)) +
-  geom_errorbar(aes(ymin = Seedmix - se, ymax = Seedmix + se), width = 0.3, size = 1, position = dodge) +
-  geom_point(position = 'identity', size = 2.5) +
-  xlab("Grazed") +
-  scale_y_continuous("Seedmix Proportion", limits = smx.lims) +
-  scale_color_manual(values = cgr.colors) +
-  scale_x_discrete(limits = sns.labs, labels = sns.labs) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); cgr.smx.plt
+cgr.smx.plt <- ggplot(cgr.smx.pltdf, aes(Year, Seedmix, color = rep.int("Z", nrow(cgr.smx.pltdf)))) +
+  geom_line(aes(group = rep.int("Z", nrow(cgr.smx.pltdf))), size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2.5, position = dodge) +
+  geom_errorbar(aes(ymax = Seedmix + se, ymin = Seedmix - se), position = dodge, width = 0.3) +
+  geom_vline(xintercept = c(2014.4, 2014.5, 2014.6, 2017.4), linetype = c(1, 2, 3, 1)) +
+  scale_y_continuous("Proportion Seed-mix ≥25% Cover", limits = smx.lims) +
+  scale_x_continuous(breaks = seq(2014, 2018, 1)) +
+  scale_color_manual(values = cgr.ns.color) +
+  pref.theme + theme(legend.position = "none"); cgr.smx.plt
 
-ugr.smx.plt <- ggplot(ugr.smx.pltdf, aes(Herbicide.Treatment, Seedmix, color = Herbicide.Treatment)) +
-  geom_errorbar(aes(ymin = Seedmix - se, ymax = Seedmix + se), width = 0.3, size = 1, position = dodge) +
-  geom_point(position = 'identity', size = 2.5) +
-  xlab("Un-Grazed") +
-  scale_y_continuous("Seedmix Proportion", limits = smx.lims) +
-  scale_color_manual(values = ugr.colors) +
-  scale_x_discrete(limits = sns.labs, labels = sns.labs) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); ugr.smx.plt
+ugr.smx.plt <- ggplot(ugr.smx.pltdf, aes(Year, Seedmix, color = rep.int("Z", nrow(cgr.smx.pltdf)))) +
+  geom_line(aes(group = rep.int("Z", nrow(cgr.smx.pltdf))), size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2.5, position = dodge) +
+  geom_errorbar(aes(ymax = Seedmix + se, ymin = Seedmix - se), position = dodge, width = 0.3) +
+  geom_vline(xintercept = c(2014.5, 2014.6), linetype = c(2, 3)) +
+  scale_y_continuous("Proportion Seed-mix ≥25% Cover", limits = smx.lims) +
+  scale_x_continuous(breaks = seq(2014, 2018, 1)) +
+  scale_color_manual(values = ugr.ns.color) +
+  pref.theme + theme(legend.position = "none"); ugr.smx.plt
 
 # Save it.
 plot_grid(cgr.smx.plt, ugr.smx.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Seedmix.pdf", plot = last_plot())
 
-##  -----------------------------------------  ##
-            # Forbs ####
-##  -----------------------------------------  ##
-procD.lm(Forbs ~ Herbicide.Treatment * Year, data = cgr) # yr & trt = sig
-simp.procD(advanced.procD.lm(Forbs ~ Herbicide.Treatment * Year, ~ 1, ~ Composite.Variable, data = cgr))
-  ## Only marginal significance for some pairwise comparisons (after adjustment)
+##  ---------------------------------------------------------------------------------------------  ##
+                                # Forbs ####
+##  ---------------------------------------------------------------------------------------------  ##
+procD.lm(Forbs ~ Herbicide.Treatment * Year, data = cgr) # all sig
 
-procD.lm(Forbs ~ Herbicide.Treatment * Year, data = ugr) # NS
+procD.lm(Forbs ~ Herbicide.Treatment * Year, data = ugr) # interxn = NS
+procD.lm(Forbs ~ Herbicide.Treatment + Year, data = ugr) # NS
 
 cgr.frb.pltdf <- summarySE(data = cgr, measurevar = "Forbs", groupvars = c("Herbicide.Treatment", "Year"))
-ugr.frb.pltdf <- summarySE(data = ugr, measurevar = "Forbs", groupvars = c("Herbicide.Treatment", "Year"))
+cgr.frb.pltdf$Year <- as.numeric(as.character(cgr.frb.pltdf$Year))
+ugr.frb.pltdf <- summarySE(data = ugr, measurevar = "Forbs", groupvars = c("Year"))
+ugr.frb.pltdf$Year <- as.numeric(as.character(ugr.frb.pltdf$Year))
 frb.lims <- minmax(c(cgr.frb.pltdf[,4], ugr.frb.pltdf[,4]))
 
 # Plots
-cgr.frb.plt <- ggplot(cgr.frb.pltdf, aes(Herbicide.Treatment, Forbs, color = Year)) +
-  geom_errorbar(aes(ymin = Forbs - se, ymax = Forbs + se), width = 0.3, size = 1, position = dodge) +
-  geom_point(stat = 'identity', size = 2, position = dodge) +
-  scale_y_continuous("Forbs % Cover", limits = frb.lims) +
-  xlab("Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); cgr.frb.plt
+cgr.frb.plt <- ggplot(cgr.frb.pltdf, aes(Year, Forbs, color = Herbicide.Treatment)) +
+  geom_line(aes(group = Herbicide.Treatment), size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2.5, position = dodge) +
+  geom_errorbar(aes(ymax = Forbs + se, ymin = Forbs - se), position = dodge, width = 0.3) +
+  geom_vline(xintercept = c(2014.4, 2014.5, 2014.6, 2017.4), linetype = c(1, 2, 3, 1)) +
+  scale_y_continuous("Forb % Cover", limits = frb.lims) +
+  scale_x_continuous(breaks = seq(2014, 2018, 1)) +
+  scale_color_manual(values = cgr.colors) +
+  pref.theme + theme(legend.position = c(0.65, 0.9)); cgr.frb.plt
 
-ugr.frb.plt <- ggplot(ugr.frb.pltdf, aes(Herbicide.Treatment, Forbs, color = Year)) +
-  geom_errorbar(aes(ymin = Forbs - se, ymax = Forbs + se), width = 0.3, size = 1, position = dodge) +
-  geom_point(stat = 'identity', size = 2, position = dodge) +
+ugr.frb.plt <- ggplot(ugr.frb.pltdf, aes(Year, Forbs, color = rep.int("Z", nrow(ugr.frb.pltdf)))) +
+  geom_line(aes(group = rep.int("Z", nrow(ugr.frb.pltdf))), size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2.5, position = dodge) +
+  geom_errorbar(aes(ymax = Forbs + se, ymin = Forbs - se), position = dodge, width = 0.3) +
+  geom_vline(xintercept = c(2014.5, 2014.6), linetype = c(2, 3)) +
   scale_y_continuous("Forbs % Cover", limits = frb.lims) +
-  xlab("Un-Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); ugr.frb.plt
+  scale_x_continuous(breaks = seq(2014, 2018, 1)) +
+  scale_color_manual(values = ugr.ns.color) +
+  pref.theme + theme(legend.position = "none"); ugr.frb.plt
 
 # Save it.
 plot_grid(cgr.frb.plt, ugr.frb.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Forbs.pdf", plot = last_plot())
 
-##  -----------------------------------------  ##
-          # Legumes ####
-##  -----------------------------------------  ##
+##  ---------------------------------------------------------------------------------------------  ##
+                              # Legumes ####
+##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
-procD.lm(Legumes ~ Herbicide.Treatment * Year, data = cgr) # yr = marginally sig
+procD.lm(Legumes ~ Herbicide.Treatment * Year, data = cgr) # interxn = NS
+procD.lm(Legumes ~ Herbicide.Treatment + Year, data = cgr) # year = sig
 simp.procD(advanced.procD.lm(Legumes ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr))
-  ## 14 = A | 15 = B | 16 = A | 17 = B
+  ## 14 = A | 15 = A | 16 = A | 17 = B
 
-procD.lm(Legumes ~ Herbicide.Treatment * Year, data = ugr) # interxn = SIG
-simp.procD(advanced.procD.lm(Legumes ~ Herbicide.Treatment * Year, ~ 1, ~ Composite.Variable, data = ugr))
-  ## Some marginal significance after adjustment
+procD.lm(Legumes ~ Herbicide.Treatment * Year, data = ugr) # interxn = sig
 
-cgr.lgm.pltdf <- summarySE(data = cgr, measurevar = "Legumes", groupvars = c("Year", "Herbicide.Treatment"))
+# Get plottings dataframes
+cgr.lgm.pltdf <- summarySE(data = cgr, measurevar = "Legumes", groupvars = c("Year"))
+cgr.lgm.pltdf$Year <- as.numeric(as.character(cgr.lgm.pltdf$Year))
 ugr.lgm.pltdf <- summarySE(data = ugr, measurevar = "Legumes", groupvars = c("Year", "Herbicide.Treatment"))
+ugr.lgm.pltdf$Year <- as.numeric(as.character(ugr.lgm.pltdf$Year))
 lgm.lims <- minmax(c(cgr.lgm.pltdf[,4], ugr.lgm.pltdf[,4]))
 
 # Plot
-cgr.lgm.plt <- ggplot(cgr.lgm.pltdf, aes(Herbicide.Treatment, Legumes, color = Year)) +
-  geom_errorbar(aes(ymin = Legumes - se, ymax = Legumes + se), width = 0.3, size = 1, position = dodge) +
-  geom_point(stat = 'identity', size = 2, position = dodge) +
-  scale_y_continuous("Legumes % Cover", limits = c()) +
-  xlab("Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); cgr.lgm.plt
-
-ugr.lgm.plt <- ggplot(ugr.lgm.pltdf, aes(Herbicide.Treatment, Legumes, color = Year)) +
-  geom_errorbar(aes(ymin = Legumes - se, ymax = Legumes + se), width = 0.3, size = 1, position = dodge) +
-  geom_point(stat = 'identity', size = 2, position = dodge) +
+cgr.lgm.plt <- ggplot(cgr.lgm.pltdf, aes(Year, Legumes, color = rep.int("Z", nrow(cgr.lgm.pltdf)))) +
+  geom_line(aes(group = rep.int("Z", nrow(cgr.lgm.pltdf))), size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2.5, position = dodge) +
+  geom_errorbar(aes(ymax = Legumes + se, ymin = Legumes - se), position = dodge, width = 0.3) +
+  geom_vline(xintercept = c(2014.4, 2014.5, 2014.6, 2017.4), linetype = c(1, 2, 3, 1)) +
   scale_y_continuous("Legumes % Cover", limits = lgm.lims) +
-  xlab("Un-Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); ugr.lgm.plt
+  scale_x_continuous(breaks = seq(2014, 2018, 1)) +
+  scale_color_manual(values = cgr.ns.color) +
+  pref.theme + theme(legend.position = "none"); cgr.lgm.plt
+
+ugr.lgm.plt <- ggplot(ugr.lgm.pltdf, aes(Year, Legumes, color = Herbicide.Treatment)) +
+  geom_line(aes(group = Herbicide.Treatment), size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2.5, position = dodge) +
+  geom_errorbar(aes(ymax = Legumes + se, ymin = Legumes - se), position = dodge, width = 0.3) +
+  geom_vline(xintercept = c(2014.5, 2014.6), linetype = c(2, 3)) +
+  scale_y_continuous("Legume % Cover", limits = lgm.lims) +
+  scale_x_continuous(breaks = seq(2014, 2018, 1)) +
+  scale_color_manual(values = ugr.colors) +
+  pref.theme + theme(legend.position = c(0.65, 0.9)); ugr.lgm.plt
 
 plot_grid(cgr.lgm.plt, ugr.lgm.plt, labels = panel.labs, nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Legumes.pdf", plot = last_plot())
 
-##  -----------------------------------------  ##
-            # Woody ####
-##  -----------------------------------------  ##
+##  ---------------------------------------------------------------------------------------------  ##
+                                # Woody ####
+##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
 procD.lm(Woody ~ Herbicide.Treatment * Year, data = cgr) # trt = marginally sig
 simp.procD(advanced.procD.lm(Woody ~ Herbicide.Treatment + Year, ~ 1, ~ Herbicide.Treatment, data = cgr))
