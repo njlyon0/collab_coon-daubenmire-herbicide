@@ -1,26 +1,10 @@
 ##  --------------------------------------------------------------------------------------------------------------------------------------  ##
-                             # Daubenmire Data - Herbicide Treatment Project
+                      # Vegetation Response to Anti-Tall Fescue Herbicide Treatments
 ##  --------------------------------------------------------------------------------------------------------------------------------------  ##
-# Project Leads
-  ## Jaime J Coon & Nicholas J Lyon
-
-# Main Project Question(s)
-  ## How do plants respond to anti-fescue herbicide treatments?
-
-# NOTE ON STATS:
-  # "sig" = significant at alpha = 0.05 (p < 0.05)
-      ## This is the only result that will get plotted
-  # "marginally sig" = significant at alpha = 0.10 (p < 0.10)
-  # "NS" = p > 0.10
-
-# NOTE ON COLORS:
-  # Colors are selected to be colorblind safe
-
 # Code written by Nicholas J Lyon
 
-##  ---------------------------------------------------------------------------------------------  ##
-                            # Nuts & Bolts ####
-##  ---------------------------------------------------------------------------------------------  ##
+# START ####
+
 # Required libraries
 library(geomorph) # Analysis
 library(ggplot2); library(cowplot) # Plotting
@@ -160,17 +144,10 @@ minmax <- function(x, dig = 0, slack = 10){
   
 }
 
-# RESEARCH QUESTIONS ####
 
-# Question 1: What was the effect of the spray and seed project* on veg characteristics
-  ## * = ON GRAZED SITES (CGRs)
-
-# Question 2: What was the effect of the spray and seed project* on veg characteristics
-  ## * = ON UN-GRAZED SITES (UGRs)
-
-##  -----------------------------------------  ##
-     # Cool Season Grasses ####
-##  -----------------------------------------  ##
+##  ---------------------------------------------------------------------------------------------  ##
+                        # Cool Season Grasses ####
+##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
 procD.lm(CSG ~ Herbicide.Treatment * Year, data = cgr) # NS
 procD.lm(CSG ~ Herbicide.Treatment * Year, data = ugr) # trt = sig
