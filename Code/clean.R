@@ -148,6 +148,16 @@ sort(unique(drydock$Seedmix.for.Calc))
 drydock$Seedmix.of.Total <- drydock$Forbs * drydock$Seedmix.for.Calc
 sort(unique(drydock$Seedmix.of.Total))
 
+# These values are likely the actual % seed-mix of total, so you need to convert it back to our categories
+drydock$Seedmix.of.Total[drydock$Seedmix.of.Total > 0 & drydock$Seedmix.of.Total <= 1] <- 1
+drydock$Seedmix.of.Total[drydock$Seedmix.of.Total > 1 & drydock$Seedmix.of.Total <= 5] <- 3
+drydock$Seedmix.of.Total[drydock$Seedmix.of.Total > 5 & drydock$Seedmix.of.Total <= 25] <- 16
+drydock$Seedmix.of.Total[drydock$Seedmix.of.Total > 25 & drydock$Seedmix.of.Total <= 50] <- 38
+drydock$Seedmix.of.Total[drydock$Seedmix.of.Total > 50 & drydock$Seedmix.of.Total <= 75] <- 63
+drydock$Seedmix.of.Total[drydock$Seedmix.of.Total > 75 & drydock$Seedmix.of.Total <= 95] <- 86
+drydock$Seedmix.of.Total[drydock$Seedmix.of.Total > 95 & drydock$Seedmix.of.Total <= 100] <- 98
+sort(unique(drydock$Seedmix.of.Total))
+
 # And now ditch the "Seedmix.for.Calc" column (because you've gotten what you needed out of it)
 drydock1 <- drydock[,-c(ncol(drydock)-1)]
 
