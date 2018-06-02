@@ -57,9 +57,6 @@ sort(unique(sdmx$Sdmx.of.Total.TRUE))
 sdmx$Sdmx.of.Total.CALC <- sdmx$Forbs * sdmx$Sdmx.for.Calc
 sort(unique(sdmx$Sdmx.of.Total.CALC))
 
-# Save these values as a new column and continue
-sdmx$Sdmx.of.Total.RAW.CALC <- sdmx$Sdmx.of.Total.CALC
-
 # Now modify the derived values to fit into our pseudo-continuous category system
 sdmx$Sdmx.of.Total.CALC[sdmx$Sdmx.of.Total.CALC > 0 & sdmx$Sdmx.of.Total.CALC <= 1] <- 1
 sdmx$Sdmx.of.Total.CALC[sdmx$Sdmx.of.Total.CALC > 1 & sdmx$Sdmx.of.Total.CALC <= 5] <- 3
@@ -114,11 +111,11 @@ num.wrong <- function(calc.vec, true.vec, thresh){
 }
 
 # Now get the number wrong for all possible thresholds
-wrng.05 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.RAW.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 3)
-wrng.25 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.RAW.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 16)
-wrng.50 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.RAW.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 38)
-wrng.75 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.RAW.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 63)
-wrng.95 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.RAW.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 86)
+wrng.05 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 3)
+wrng.25 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 16)
+wrng.50 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 38)
+wrng.75 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 63)
+wrng.95 <- num.wrong(calc.vec = sdmx$Sdmx.of.Total.CALC, true.vec = sdmx$Sdmx.of.Total.TRUE, thresh = 86)
 
 # What are those values?
 wrng.qdrt; wrng.05; wrng.25; wrng.50; wrng.75; wrng.95
