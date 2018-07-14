@@ -240,11 +240,11 @@ sort(unique(herb$Composite.Variable))
 
 # Re-order
 ncol(herb)
-herb <- herb[,c(1:7, 20, 8:19)]
-ncol(herb)
+herb.v2 <- herb[,c(1:7, 22, 8:21)]
+ncol(herb.v2)
 
 # Save out those this dataframe because it is ready to roll!
-write.csv(herb, "./Data/snsdata.csv", row.names = F)
+write.csv(herb.v2, "./Data/snsdata.csv", row.names = F)
 
 # END ####
 
