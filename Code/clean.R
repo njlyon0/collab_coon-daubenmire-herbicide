@@ -178,7 +178,19 @@ daub.v3$Seedmix.of.Total[daub.v3$Seedmix.of.Total > 16 & daub.v3$Seedmix.of.Tota
 sort(unique(daub.v3$Seedmix.of.Total)) # should have only 0 or 1
 
 ##  ---------------------------------------------------------------------------------------------  ##
-                        # Get Patch-Level Averages ####
+                        # Heavy Grass Quadrats ###
+##  ---------------------------------------------------------------------------------------------  ##
+# Want to know how many quadrats have "heavy" fescue/CSG cover (i.e. > some threshold)
+
+# Set threshold
+thresh <- 50
+
+# Get a new column for "heavy" cover quadrats
+daub.v3$Heavy.Fescue <- ifelse(daub.v3$Fescue > thresh, yes = 1, no = 0)
+daub.v3$Heavy.CSG <- ifelse(daub.v3$CSG > thresh, yes = 1, no = 0)
+
+##  ---------------------------------------------------------------------------------------------  ##
+                        # Get Patch-Level Values ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Get patch-level averages for all the response variables
 daub.v4 <- ddply(daub.v3, 
@@ -196,7 +208,9 @@ daub.v4 <- ddply(daub.v3,
             Seedmix = mean(Seedmix.of.Total),
             Robel = mean(Robel),
             Panic = mean(Panic),
-            LitDep = mean(Litter_dep))
+            LitDep = mean(Litter_dep),
+            Hvy.Fesc = sum(Heavy.Fescue),
+            Hvy.CSG = sum(Heavy.CSG))
 
 # Should lose a *lot* of rows
 nrow(daub.v3); nrow(daub.v4)
