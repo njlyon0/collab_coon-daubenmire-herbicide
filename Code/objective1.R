@@ -6,7 +6,7 @@
 # START ####
 
 # Required libraries
-library(geomorph) # Analysis
+library(RRPP) # Analysis
 library(ggplot2); library(cowplot) # Plotting
 library(Rmisc) # get summary values for plotting
 
@@ -51,85 +51,198 @@ pref.theme <- theme(panel.grid.major = element_blank(), panel.grid.minor = eleme
                     legend.title = element_blank())
 
 # Helpful custom functions
-  ## Simplify advanced.procD.lm output and do multiple comparison adjustment (run as wrapper)
-simp.procD <- function(adv.procD.obj, p.dig = 4, crit.dig = 4){
-  ## adv.procD.obj = object of a geomorph::advanced.procD.lm function
-  ## p.dig = the number of digits you want the p value rounded to
-  ## thresh = the upper threshold of the p values you want to keep
+  ## Modification of RRPP's summary function to do multiple comparison adjustment as a matter of course
+simp.rrpp <- function (object, test.type = c("dist", "VC", "var"), angle.type = c("rad", "deg"),
+                       stat.table = T, confidence = 0.95, show.vectors = F, crit.dig = 3, ...) {
   
-  # Get just the p values 
-  pairs <- adv.procD.obj$P.means.dist
-  ## You can refer to the whole output later to get relevant stats when you know what you're looking for
+  test.type <- match.arg(test.type)
+  angle.type <- match.arg(angle.type)
+  x <- object
+  if (test.type != "var") { # if you don't specify that the test.type is "var" (which means variances), see what the object should take
+    if (is.null(x$LS.means)) 
+      type = "slopes"  # this would be appropriate for linear regression analyses
+    if (is.null(x$slopes)) 
+      type = "means" # this would be appropriate for ANOVAs. For my data, that turned it into type = 'means'
+  }
+  else type <- "var" # ignore for my data
+  RRPP:::print.pairwise(x) # Print onscreen the output from the fitted object
+  cat("\n") # add a line in the output
+  vars <- object$vars # needed. not sure why but setting something up with iterations I think
+  if (type == "var") { # ignore for my data
+    var.diff <- lapply(1:NCOL(vars), function(j) {
+      v <- as.matrix(vars[, j])
+      as.matrix(dist(v))
+    })
+    L <- d.summary.from.list(var.diff)
+    cat("\nObserved variances by group\n\n")
+    print(vars[, 1])
+    if (stat.table) {
+      tab <- makePWDTable(L)
+      cat("\nPairwise distances between variances, plus statistics\n")
+      print(tab)
+    }
+    else {
+      cat("\nPairwise distances between variances\n")
+      print(L$D)
+      cat("\nPairwise", paste(L$confidence * 100, "%", 
+                              sep = ""), "upper confidence limits between variances\n")
+      print(L$CL)
+      cat("\nPairwise effect sizes (Z) between variances\n")
+      print(L$Z)
+      cat("\nPairwise P-values between variances\n")
+      print(L$P)
+    }
+  }
+  if (type == "means") { # this is appropriate for my data
+    cat("LS means:\n") 
+    if (show.vectors) 
+      print(x$LS.means[[1]])
+    else cat("Vectors hidden (use show.vectors = TRUE to view)\n") # print out message for LS means output
+    if (test.type == "dist") { # if type = dist (like my data)
+      L <- RRPP:::d.summary.from.list(x$means.dist)  # THIS IS WHERE THE P VALUE LIST IS MADE - L$P
+      if (stat.table) { # if you ask for it in a table, this is how it's made
+        tab <- RRPP:::makePWDTable(L) # making the table
+        cat("\nPairwise distances between means, plus statistics\n")
+        print(tab) 
+      }
+      else { # ignore
+        cat("\nPairwise distances between means\n")
+        print(L$D)
+        cat("\nPairwise", paste(L$confidence * 100, "%", 
+                                sep = ""), "upper confidence limits between means\n")
+        print(L$CL)
+        cat("\nPairwise effect sizes (Z) between means\n")
+        print(L$Z)
+        cat("\nPairwise P-values between means\n")
+        print(L$P)
+      }
+    }
+    if (test.type == "VC") {
+      L <- r.summary.from.list(x$means.vec.cor)
+      if (stat.table) {
+        tab <- makePWCorTable(L)
+        cat("\nPairwise statistics based on mean vector correlations\n")
+        if (angle.type == "deg") {
+          tab$angle <- tab$angle * 180/pi
+          tab[, 3] <- tab[, 3] * 180/pi
+        }
+        print(tab)
+      }
+      else {
+        cat("\nPairwise vector correlations between mean vectors\n")
+        print(L$r)
+        cat("\nPairwise angles between mean vectors\n")
+        if (angle.type == "deg") 
+          print(L$angle * 180/pi)
+        else print(L$angle)
+        cat("\nPairwise", paste(L$confidence * 100, "%", 
+                                sep = ""), "upper confidence limits for angles between mean vectors\n")
+        if (angle.type == "deg") 
+          print(L$aCL * 180/pi)
+        else print(L$aCL)
+        cat("\nPairwise effect sizes (Z) for angles between mean vectors\n")
+        print(L$Z)
+        cat("\nPairwise P-values for angles between mean vectors\n")
+        print(L$P)
+      }
+    }
+  }
+  if (type == "slopes") {
+    cat("Slopes (vectors of variate change per one unit of covariate change, by group):\n")
+    if (show.vectors) 
+      print(x$slopes[[1]])
+    else cat("Vectors hidden (use show.vectors = TRUE to view)\n")
+    if (test.type == "dist") {
+      cat("\nSlope vector lengths\n")
+      print(x$slopes.length[[1]])
+      L <- d.summary.from.list(x$slopes.dist)
+      if (stat.table) {
+        tab <- makePWDTable(L)
+        cat("\nPairwise absolute difference (d) between vector lengths, plus statistics\n")
+        print(tab)
+      }
+      else {
+        cat("\nPairwise absolute differences (d) between slope lengths\n")
+        print(L$D)
+        cat("\nPairwise", paste(L$confidence * 100, "%", 
+                                sep = ""), "upper confidence limits between slope lengths\n")
+        print(L$CL)
+        cat("\nPairwise effect sizes (Z) between slope lengths\n")
+        print(L$Z)
+        cat("\nPairwise P-values between slope lengths\n")
+        print(L$P)
+      }
+    }
+    if (test.type == "VC") {
+      L <- r.summary.from.list(x$slopes.vec.cor)
+      cat("\nPairwise statistics based on slopes vector correlations (r) and angles, acos(r)")
+      cat("\nThe null hypothesis is that r = 1 (parallel vectors).")
+      cat("\nThis null hypothesis is better treated as the angle between vectors = 0\n")
+      if (stat.table) {
+        tab <- makePWCorTable(L)
+        if (angle.type == "deg") {
+          tab$angle <- tab$angle * 180/pi
+          tab[, 3] <- tab[, 3] * 180/pi
+        }
+        print(tab)
+      }
+      else {
+        cat("\nPairwise vector correlations between slope vectors\n")
+        print(L$r)
+        cat("\nPairwise angles between slope vectors\n")
+        if (angle.type == "deg") 
+          print(L$angle * 180/pi)
+        else print(L$angle)
+        cat("\nPairwise", paste(L$confidence * 100, "%", 
+                                sep = ""), "upper confidence limits for angles between mean vectors\n")
+        if (angle.type == "deg") 
+          print(L$aCL * 180/pi)
+        else print(L$aCL)
+        cat("\nPairwise effect sizes (Z) for angles between slope vectors\n")
+        print(L$Z)
+        cat("\nPairwise P-values for angles between slope vectors\n")
+        print(L$P)
+      }
+    }
+  }
   
-  # Want to ditch either the top diagonal or the bottom diagonal of the matrix of p-values
-  ## These are the mirror image of the opposite triangle of the matrix
-  ## I've arbitrarily chosen to eliminate the lower triangle, but it doesn't matter
-  pairs[lower.tri(pairs, diag = T)] <- NA
+  # Make new dataframe
+  df <- tab
   
-  # Now get the p values out of that matrix
-  pvals <- as.vector( round(pairs, digits = p.dig) )
+  # The following steps are necessary for performing Sequential Bonferroni multiple comparison adjustment
+  ## Order the rows from lowest to highest p value
+  results <- df[order(df$"Pr > d"), ]
   
-  # Get the list of combinations that the matrix includes
-  combos <- expand.grid(rownames(adv.procD.obj$P.means.dist), colnames(adv.procD.obj$P.means.dist))
+  ## Assign a rank based on that order
+  rank <- c(1:length(results$P))
   
-  # Get those as vectors in their own right
-  var1.vec <- combos$Var1
-  var2.vec <- combos$Var2
+  # Now modify the critical point based on that rank (hence "sequential" Bonferroni)
+  results$Alpha <- round( with(results, ( (0.05 / (length(results$"Pr > d") + 1 - rank)) ) ), digits = crit.dig)
   
-  # And just in case you want one where they're combined...
-  var.vecs <- paste(combos$Var1, "-", combos$Var2)
-  
-  # Okay, now make a dataframe of both your p values and your newly created variable vectors
-  results <- data.frame(Comparisons = var.vecs,
-                        Factor.1 = var1.vec, Factor.2 = var2.vec,
-                        P.Values = pvals)
-  
-  # Ditch the NAs you inserted (aka the pvalues along the diagonal and in the triangle you eliminated)
-  results2 <- results[complete.cases(results),]
-  
-  # Sequential Bonferroni Bit
-  
-  # For sequential Bonferroni you need to rank the pairs based on ascending p value
-  results3 <- results2[order(results2$P.Values),] # order the comparisons
-  rank <- c(1:length(results3$Comparisons)) # assign them a rank based on this order
-  
-  # Modify the critical point based on the rank of each sequential p value
-  results3$Crit.Pt <- round( with(results3, ( (0.05 / (length(results3$Comparisons) + 1 - rank)) ) ), 
-                             digits = crit.dig)
-  ## Sequential bonferroni is calculated as show above, but in plain English it is like this:
-  ## Each comparison gets it's own, sequential, critical point
-  ## This is determined by dividing the standard critical point (0.05) by
-  ## the total number of comparisons plus 1, minus the "rank" of the p value
-  ## where lower p values have a lower rank
-  ## The final pairwise comparison will always have a critical point of 0.05 in this method
-  ### E.g. 6 pairwise comparisons + 1 - 6 (for the sixth one) = 1
-  ### And 0.05 / 1 = 0.05 (duh)
-  
-  # Though you probably want to know if the stuff is significant at a glance
-  results3$"P/Crit" <- results3$P.Values / results3$Crit.Pt
+  # Helpful to know how much larger the p value is than its critical point
+  results$"P/Alpha" <- round( (results$"Pr > d" / results$Alpha), digits = crit.dig)
   
   # Now get the ranges of "significance" to be reduced to qualitative bits
-  results3$Sig <- ifelse(test = results3$"P/Crit" > 2, yes = " ",
-                         no = ifelse(test = results3$"P/Crit" > 0.2, yes = ".",
-                                     no = ifelse(test = results3$"P/Crit" > 0.02, yes = "*",
-                                                 no = ifelse(test = results3$"P/Crit" > 0.002, yes = "**", no = "***"))))
+  results$Sig <- ifelse(test = results$"P/Alpha" > 2, yes = " ",
+                        no = ifelse(test = results$"P/Alpha" > 1, yes = ".",
+                                    no = ifelse(test = results$"P/Alpha" > 0.2, yes = "*",
+                                                no = ifelse(test = results$"P/Alpha" > 0.02, yes = "**",
+                                                            no = ifelse(test = results$"P/Alpha" > 0.002, yes = "***", no = "****")))))
   ## Viewer discretion is advized when using this bonus column
   
   # Just in case you don't want to look in the guts of this function to see what * vs. ** means:
   message("Sig codes: P / Crit > 2 = ''
-          0.2 < P/C ≤ 2 = '.'
-          0.02 < P/C ≤ 0.2 = '*'
-          0.002 < P/C ≤ 0.02 = '**'
-          P/C ≤ 0.002 = '***'")
-  
-  # Get rid of the bothersome and distracting row numbering
-  row.names(results3) <- NULL
+          1 < P/C ≤ 2 = '.'
+          0.2 < P/C ≤ 1 = '*'
+          0.02 < P/C ≤ 0.2 = '**'
+          0.002 < P/C ≤ 0.02 = '***'
+          P/C ≤ 0.002 = '****'")
   
   # And spit out the result
-  return(results3)
+  return(results)
   
 }
-  ## Get's min and max values from a supplied vector, good for setting plot limits
+## Get's min and max values from a supplied vector, good for setting plot limits
 minmax <- function(x, dig = 0, slack = 10){
   ## x = vector for checking (can be concatenated from multiple sources but must be single object)
   ## dig = digits to round min and max to (default is 0 to yield integers)
