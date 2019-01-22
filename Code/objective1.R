@@ -16,6 +16,9 @@ setwd("~/Documents/School/1. Iowa State/Collaborations/'Daubenmire Herbicide Bit
 # Clear environment of other stuff
 rm(list = ls())
 
+##  ---------------------------------------------------------------------------------------------  ##
+                              # Housekeeping ####
+##  ---------------------------------------------------------------------------------------------  ##
 # Pull in the dataset
 sns <- read.csv("./Data/snsdata.csv")
 
@@ -42,7 +45,6 @@ cgr.colors <- c("Con" = "#d73027", "Spr" = "#f46d43", "SnS" = "#fdae61") # shade
 ugr.colors <- c("Con" = "#4575b4", "Spr" = "#74add1", "SnS" = "#abd9e9") # shades of blue
 cgr.ns.color <- "#fdae61"
 ugr.ns.color <- "#abd9e9"
-panel.labs <- c("A)", "B)")
 dodge <- position_dodge(width = 0.5)
 cgr.vlines <- geom_vline(xintercept = c(2014.4, 2014.5, 2014.6, 2017.4), linetype = c(1, 2, 3, 1))
 ugr.vlines <- geom_vline(xintercept = c(2014.5, 2014.6), linetype = c(2, 3))
@@ -262,16 +264,28 @@ minmax <- function(x, dig = 0, slack = 10){
   
 }
 
+# General analytical procedure
+  ## 1) Fit model with interaction term and assess *ONLY* the interaction term
+  ## 2) If insignificant, run a new model without it (if significant, stop there, you're done)
+  ## 3) If either explanatory variable is significant, fit a separate model of just that one
+  ## 4) Run pairwise comparisons on that single-variable model
+
 ##  ---------------------------------------------------------------------------------------------  ##
                          # Cool Season Grasses ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
-procD.lm(CSG ~ Herbicide.Treatment * Year, data = cgr) # interxn = NS
-procD.lm(CSG ~ Herbicide.Treatment + Year, data = cgr) # NS
+anova(lm.rrpp(CSG ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F")
+  ## interxn = NS
+anova(lm.rrpp(CSG ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F")
+  ## NS
 
-procD.lm(CSG ~ Herbicide.Treatment * Year, data = ugr) # interxn = NS
-procD.lm(CSG ~ Herbicide.Treatment + Year, data = ugr) # treat = sig, year = marginal
-simp.procD(advanced.procD.lm(CSG ~ Herbicide.Treatment + Year, ~ 1, ~ Herbicide.Treatment, data = ugr))
+anova(lm.rrpp(CSG ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F")
+  ## interxn = NS
+anova(lm.rrpp(CSG ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F")
+  ## treat = sig, year = marginal
+csg.trt.fit <- lm.rrpp(CSG ~ Herbicide.Treatment, data = ugr, iter = 9999)
+csg.trt.pairs <- simp.rrpp(pairwise(csg.trt.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
+csg.trt.pairs
   ## Con = A | Spr = AB | SnS = B
 
 # Get summary stats for plotting
@@ -299,20 +313,26 @@ ugr.csg.plt <- ggplot(ugr.csg.pltdf, aes(Herbicide.Treatment, CSG, color = Herbi
   pref.theme + theme(legend.position = "none"); ugr.csg.plt
 
 # Save it
-plot_grid(cgr.csg.plt, ugr.csg.plt, labels = panel.labs, nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/CSG.pdf", plot = last_plot())
+plot_grid(cgr.csg.plt, ugr.csg.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Graphs/CSG.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
 
 ##  ---------------------------------------------------------------------------------------------  ##
                         # Warm Season Grasses ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
-procD.lm(WSG ~ Herbicide.Treatment * Year, data = cgr) # interxn = NS
-procD.lm(WSG ~ Herbicide.Treatment + Year, data = cgr) # NS
+anova(lm.rrpp(WSG ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F")
+  ## interxn = NS
+anova(lm.rrpp(WSG ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F")
+  ## NS
 
-procD.lm(WSG ~ Herbicide.Treatment * Year, data = ugr) # interxn = marginal
-procD.lm(WSG ~ Herbicide.Treatment + Year, data = ugr) # treat = sig
-simp.procD(advanced.procD.lm(WSG ~ Herbicide.Treatment + Year, ~ 1, ~ Herbicide.Treatment, data = ugr))
-  ## Con = A | Spr = A | SnS = B
+anova(lm.rrpp(WSG ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F")
+  ## interxn = marginal
+anova(lm.rrpp(WSG ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F")
+  ## treat = sig, year = marginal
+wsg.trt.fit <- lm.rrpp(WSG ~ Herbicide.Treatment, data = ugr, iter = 9999)
+wsg.trt.pairs <- simp.rrpp(pairwise(wsg.trt.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
+wsg.trt.pairs
+  ## Con = A | Spr = AB | SnS = B
 
 # Get summary stats for plotting
 cgr.wsg.pltdf <- summarySE(data = cgr, measurevar = "WSG", groupvars = c("Herbicide.Treatment"))
@@ -339,23 +359,32 @@ ugr.wsg.plt <- ggplot(ugr.wsg.pltdf, aes(Herbicide.Treatment, WSG, color = Herbi
   pref.theme + theme(legend.position = "none"); ugr.wsg.plt
 
 # Save it.
-plot_grid(cgr.wsg.plt, ugr.wsg.plt, labels = panel.labs, nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/WSG.pdf", plot = last_plot())
+plot_grid(cgr.wsg.plt, ugr.wsg.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Graphs/WSG.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
 
 ##  ---------------------------------------------------------------------------------------------  ##
                                 # Fescue ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
-procD.lm(Fescue ~ Herbicide.Treatment * Year, data = cgr) # interxn = NS
-procD.lm(Fescue ~ Herbicide.Treatment + Year, data = cgr) # year = sig
-simp.procD(advanced.procD.lm(Fescue ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr))
-  ## 14 = A | 15 = AB | 16 = B | 17 = B
+anova(lm.rrpp(Fescue ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F")
+  ## interxn = NS
+anova(lm.rrpp(Fescue ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F")
+  ## year = sig
+fsc.yr.cgr.fit <- lm.rrpp(Fescue ~ Year, data = cgr, iter = 9999)
+fsc.yr.cgr.pairs <- simp.rrpp(pairwise(fsc.yr.cgr.fit, fit.null = NULL, groups = cgr$Year))
+fsc.yr.cgr.pairs
+  ## sig
 
-procD.lm(Fescue ~ Herbicide.Treatment * Year, data = ugr) # interxn = NS
-procD.lm(Fescue ~ Herbicide.Treatment + Year, data = ugr) # year = marginal
-simp.procD(advanced.procD.lm(Fescue ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = ugr))
-  ## 14 = A | 15 = AB | 16 = AB | 17 = B
+anova(lm.rrpp(Fescue ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F")
+  ## interxn = NS
+anova(lm.rrpp(Fescue ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F")
+  ## year = sig
+fsc.yr.ugr.fit <- lm.rrpp(Fescue ~ Year, data = ugr, iter = 9999)
+fsc.yr.ugr.pairs <- simp.rrpp(pairwise(fsc.yr.ugr.fit, fit.null = NULL, groups = ugr$Year))
+fsc.yr.ugr.pairs
+  ## NS
 
+# Plotting dataframes
 cgr.fsc.pltdf <- summarySE(data = cgr, measurevar = "Fescue", groupvars = c("Year", "Herbicide.Treatment"))
 cgr.fsc.pltdf$Year <- as.numeric(as.character(cgr.fsc.pltdf$Year))
 ugr.fsc.pltdf <- summarySE(data = ugr, measurevar = "Fescue", groupvars = c("Year", "Herbicide.Treatment"))
@@ -383,20 +412,22 @@ ugr.fsc.plt <- ggplot(ugr.fsc.pltdf, aes(Year, Fescue, color = Herbicide.Treatme
   ugr.vlines + pref.theme + 
   theme(legend.position = c(0.65, 0.9)); ugr.fsc.plt
 
-plot_grid(cgr.fsc.plt, ugr.fsc.plt, labels = panel.labs, nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/Fescue.pdf", plot = last_plot())
+plot_grid(cgr.fsc.plt, ugr.fsc.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Graphs/Fescue.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
 
 ##  ---------------------------------------------------------------------------------------------  ##
                         # Seedmix Threshhold ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
-procD.lm(Seedmix ~ Herbicide.Treatment * Year, data = cgr) # interxn = NS
-procD.lm(Seedmix ~ Herbicide.Treatment + Year, data = cgr) # year = sig
-simp.procD(advanced.procD.lm(Seedmix ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr))
-  ## 2014 = A | 2015 = AB | 2016 = BC | 2017 = C
+anova(lm.rrpp(Seedmix ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # interxn = NS
+anova(lm.rrpp(Seedmix ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # year = sig
+smx.yr.cgr.fit <- lm.rrpp(Seedmix ~ Year, data = cgr, iter = 9999)
+smx.yr.cgr.pairs <- simp.rrpp(pairwise(smx.yr.cgr.fit, fit.null = NULL, groups = cgr$Year))
+smx.yr.cgr.pairs
+  ## 14≠17
 
-procD.lm(Seedmix ~ Herbicide.Treatment * Year, data = ugr) # interxn = NS
-procD.lm(Seedmix ~ Herbicide.Treatment + Year, data = ugr) # NS
+anova(lm.rrpp(Seedmix ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # interxn = NS
+anova(lm.rrpp(Seedmix ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
 
 cgr.smx.pltdf <- summarySE(data = cgr, measurevar = "Seedmix", groupvars = c("Year"))
 cgr.smx.pltdf$Year <- as.numeric(as.character(cgr.smx.pltdf$Year))
@@ -426,16 +457,16 @@ ugr.smx.plt <- ggplot(ugr.smx.pltdf, aes(Year, Seedmix, color = rep.int("Z", nro
   pref.theme + theme(legend.position = "none"); ugr.smx.plt
 
 # Save it.
-plot_grid(cgr.smx.plt, ugr.smx.plt, labels = panel.labs, nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/Seedmix.pdf", plot = last_plot())
+plot_grid(cgr.smx.plt, ugr.smx.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Graphs/Seedmix.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
 
 ##  ---------------------------------------------------------------------------------------------  ##
                                 # Forbs ####
 ##  ---------------------------------------------------------------------------------------------  ##
-procD.lm(Forbs ~ Herbicide.Treatment * Year, data = cgr) # all sig
+anova(lm.rrpp(Forbs ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # all sig
 
-procD.lm(Forbs ~ Herbicide.Treatment * Year, data = ugr) # interxn = NS
-procD.lm(Forbs ~ Herbicide.Treatment + Year, data = ugr) # NS
+anova(lm.rrpp(Forbs ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # interxn = NS
+anova(lm.rrpp(Forbs ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
 
 cgr.frb.pltdf <- summarySE(data = cgr, measurevar = "Forbs", groupvars = c("Herbicide.Treatment", "Year"))
 cgr.frb.pltdf$Year <- as.numeric(as.character(cgr.frb.pltdf$Year))
@@ -465,19 +496,21 @@ ugr.frb.plt <- ggplot(ugr.frb.pltdf, aes(Year, Forbs, color = rep.int("Z", nrow(
   pref.theme + theme(legend.position = "none"); ugr.frb.plt
 
 # Save it.
-plot_grid(cgr.frb.plt, ugr.frb.plt, labels = panel.labs, nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/Forbs.pdf", plot = last_plot())
+plot_grid(cgr.frb.plt, ugr.frb.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Graphs/Forbs.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
 
 ##  ---------------------------------------------------------------------------------------------  ##
                               # Legumes ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
-procD.lm(Legumes ~ Herbicide.Treatment * Year, data = cgr) # interxn = NS
-procD.lm(Legumes ~ Herbicide.Treatment + Year, data = cgr) # year = sig
-simp.procD(advanced.procD.lm(Legumes ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr))
-  ## 14 = A | 15 = A | 16 = A | 17 = B
+anova(lm.rrpp(Legumes ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # interxn = NS
+anova(lm.rrpp(Legumes ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # year = sig
+lgm.yr.cgr.fit <- lm.rrpp(Legumes ~ Year, data = cgr, iter = 9999)
+lgm.yr.cgr.pairs <- simp.rrpp(pairwise(lgm.yr.cgr.fit, fit.null = NULL, groups = cgr$Year))
+lgm.yr.cgr.pairs
+  ## 14≠17
 
-procD.lm(Legumes ~ Herbicide.Treatment * Year, data = ugr) # interxn = sig
+anova(lm.rrpp(Legumes ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # interxn = sig
 
 # Get plottings dataframes
 cgr.lgm.pltdf <- summarySE(data = cgr, measurevar = "Legumes", groupvars = c("Year"))
@@ -507,24 +540,30 @@ ugr.lgm.plt <- ggplot(ugr.lgm.pltdf, aes(Year, Legumes, color = Herbicide.Treatm
   scale_color_manual(values = ugr.colors) +
   pref.theme + theme(legend.position = c(0.65, 0.9)); ugr.lgm.plt
 
-plot_grid(cgr.lgm.plt, ugr.lgm.plt, labels = panel.labs, nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/Legumes.pdf", plot = last_plot())
+plot_grid(cgr.lgm.plt, ugr.lgm.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Graphs/Legumes.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
 
 ##  ---------------------------------------------------------------------------------------------  ##
                                 # Woody ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
-procD.lm(Woody ~ Herbicide.Treatment * Year, data = cgr) # trt = marginally sig
-simp.procD(advanced.procD.lm(Woody ~ Herbicide.Treatment + Year, ~ 1, ~ Herbicide.Treatment, data = cgr))
+anova(lm.rrpp(Woody ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # interxn = NS
+anova(lm.rrpp(Woody ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # trt = sig
+wdy.trt.cgr.fit <- lm.rrpp(Woody ~ Herbicide.Treatment, data = cgr, iter = 9999)
+wdy.trt.cgr.pairs <- simp.rrpp(pairwise(wdy.trt.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+wdy.trt.cgr.pairs
   ## Con = AB | Spr = A | SnS = B
 
-procD.lm(Woody ~ Herbicide.Treatment * Year, data = ugr) # yr = sig
-simp.procD(advanced.procD.lm(Woody ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = ugr))
-  ## 14 = A | 15 = A | 16 = A | 17 = B
+anova(lm.rrpp(Woody ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # interxn = NS
+anova(lm.rrpp(Woody ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # yr = sig
+wdy.yr.ugr.fit <- lm.rrpp(Woody ~ Year, data = ugr, iter = 9999)
+wdy.yr.ugr.pairs <- simp.rrpp(pairwise(wdy.yr.ugr.fit, fit.null = NULL, groups = ugr$Year))
+wdy.yr.ugr.pairs
+  ## sig
 
 cgr.wdy.pltdf <- summarySE(data = cgr, measurevar = "Woody", groupvars = c("Herbicide.Treatment"))
 ugr.wdy.pltdf <- summarySE(data = ugr, measurevar = "Woody", groupvars = c("Year"))
-wdy.lims <-minmax(c(cgr.wdy.pltdf[,3], ugr.wdy.pltdf[,3]))
+wdy.lims <- minmax(c(cgr.wdy.pltdf[,3], ugr.wdy.pltdf[,3]))
 
 # Plot
 cgr.wdy.plt <- ggplot(cgr.wdy.pltdf, aes(Herbicide.Treatment, Woody, color = Herbicide.Treatment)) +
@@ -547,17 +586,20 @@ ugr.wdy.plt <- ggplot(ugr.wdy.pltdf, aes(Year, Woody, color = Year)) +
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.wdy.plt
 
-plot_grid(cgr.wdy.plt, ugr.wdy.plt, labels = panel.labs, nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/Woody.pdf", plot = last_plot())
+plot_grid(cgr.wdy.plt, ugr.wdy.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Graphs/Woody.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
 
 ##  -----------------------------------------  ##
           # Bare Cover ####
 ##  -----------------------------------------  ##
-procD.lm(Bare ~ Herbicide.Treatment * Year, data = cgr) # yr = sig
-simp.procD(advanced.procD.lm(Bare ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr))
-  ## 14 = A | 15 = B | 16 = A | 17 = A
+anova(lm.rrpp(Bare ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # interxn = NS
+anova(lm.rrpp(Bare ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # yr = sig
+bar.yr.cgr.fit <- lm.rrpp(Bare ~ Year, data = cgr, iter = 9999)
+bar.yr.cgr.pairs <- simp.rrpp(pairwise(bar.yr.cgr.fit, fit.null = NULL, groups = cgr$Year))
+bar.yr.cgr.pairs
+  ## sig
 
-procD.lm(Bare ~ Herbicide.Treatment * Year, data = ugr) # NS
+anova(lm.rrpp(Bare ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # NS
 
 cgr.bar.pltdf <- summarySE(data = cgr, measurevar = "Bare", groupvars = c("Year"))
 ugr.bar.pltdf <- summarySE(data = ugr, measurevar = "Bare", groupvars = c("Year"))
@@ -584,18 +626,20 @@ ugr.bar.plt <- ggplot(ugr.bar.pltdf, aes(Year, Bare, color = Year)) +
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.bar.plt
 
-plot_grid(cgr.bar.plt, ugr.bar.plt, labels = panel.labs, nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/Bare.pdf", plot = last_plot())
+plot_grid(cgr.bar.plt, ugr.bar.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Graphs/Bare.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
 
 ##  -----------------------------------------  ##
           # Litter Cover ####
 ##  -----------------------------------------  ##
+anova(lm.rrpp(Litter ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # interxn = NS
+anova(lm.rrpp(Litter ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # yr = sig
+ltr.yr.cgr.fit <- lm.rrpp(Litter ~ Year, data = cgr, iter = 9999)
+ltr.yr.cgr.pairs <- simp.rrpp(pairwise(ltr.yr.cgr.fit, fit.null = NULL, groups = cgr$Year))
+ltr.yr.cgr.pairs
+  ## sig
 
-procD.lm(Litter ~ Herbicide.Treatment * Year, data = cgr) # interxn = sig
-simp.procD(advanced.procD.lm(Legumes ~ Herbicide.Treatment * Year, ~ 1, ~ Composite.Variable, data = cgr))
-  ## Some marginal significance after adjustment
-
-procD.lm(Litter ~ Herbicide.Treatment * Year, data = ugr) # NS
+anova(lm.rrpp(Litter ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # NS
 
 cgr.ltr.pltdf <- summarySE(data = cgr, measurevar = "Litter", groupvars = c("Year", "Herbicide.Treatment"))
 ugr.ltr.pltdf <- summarySE(data = ugr, measurevar = "Litter", groupvars = c("Year"))
@@ -622,54 +666,25 @@ ugr.ltr.plt <- ggplot(ugr.ltr.pltdf, aes(Year, Litter, color = Year)) +
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.ltr.plt
 
-plot_grid(cgr.ltr.plt, ugr.ltr.plt, labels = panel.labs, nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/Litter.pdf", plot = last_plot())
-
-##  -----------------------------------------  ##
-          # Robel (dm) ####
-##  -----------------------------------------  ##
-procD.lm(Robel ~ Herbicide.Treatment * Year, data = cgr) # NS
-
-procD.lm(Robel ~ Herbicide.Treatment * Year, data = ugr) # NS
-
-cgr.rbl.pltdf <- summarySE(data = cgr, measurevar = "Robel", groupvars = c("Herbicide.Treatment"))
-ugr.rbl.pltdf <- summarySE(data = ugr, measurevar = "Robel", groupvars = c("Herbicide.Treatment"))
-rbl.lims <- minmax(c(cgr.rbl.pltdf[,3], ugr.rbl.pltdf[,3]), slack = 1)
-
-# Plot
-cgr.rbl.plt <- ggplot(cgr.rbl.pltdf, aes(Herbicide.Treatment, Robel, color = Herbicide.Treatment)) +
-  geom_errorbar(aes(ymin = Robel - se, ymax = Robel + se), width = 0.3, size = 1) +
-  geom_point(stat = 'identity', size = 2) +
-  scale_y_continuous("Robel % Cover", limits = rbl.lims) +
-  xlab("Grazed") +
-  scale_color_manual(values = cgr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); cgr.rbl.plt
-
-ugr.rbl.plt <- ggplot(ugr.rbl.pltdf, aes(Herbicide.Treatment, Robel, color = Herbicide.Treatment)) +
-  geom_errorbar(aes(ymin = Robel - se, ymax = Robel + se), width = 0.3, size = 1) +
-  geom_point(stat = 'identity', size = 2) +
-  scale_y_continuous("Robel % Cover", limits = rbl.lims) +
-  xlab("Un-Grazed") +
-  scale_color_manual(values = ugr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); ugr.rbl.plt
-
-plot_grid(cgr.rbl.plt, ugr.rbl.plt, labels = panel.labs, nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/Robel.pdf", plot = last_plot())
+plot_grid(cgr.ltr.plt, ugr.ltr.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Graphs/Litter.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
 
 ##  -----------------------------------------  ##
              # Panic ####
 ##  -----------------------------------------  ##
-procD.lm(Panic ~ Herbicide.Treatment * Year, data = cgr) # NS
+anova(lm.rrpp(Panic ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # interxn = NS
+anova(lm.rrpp(Panic ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # yr = sig
+pnc.yr.cgr.fit <- lm.rrpp(Panic ~ Year, data = cgr, iter = 9999)
+pnc.yr.cgr.pairs <- simp.rrpp(pairwise(pnc.yr.cgr.fit, fit.null = NULL, groups = cgr$Year))
+pnc.yr.cgr.pairs
+  ## NS
 
-procD.lm(Panic ~ Herbicide.Treatment * Year, data = ugr) # NS
+anova(lm.rrpp(Panic ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # interxn = NS
+anova(lm.rrpp(Panic ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F")
 
 cgr.pnc.pltdf <- summarySE(data = cgr, measurevar = "Panic", groupvars = c("Herbicide.Treatment"))
 ugr.pnc.pltdf <- summarySE(data = ugr, measurevar = "Panic", groupvars = c("Herbicide.Treatment"))
-pnc.lims <- minmax(c(cgr.pnc.pltdf[,3], ugr.pnc.pltdf[,3]), slack = 0.1)
+pnc.lims <- minmax(c(cgr.pnc.pltdf[,3], ugr.pnc.pltdf[,3]), slack = 0.75)
 
 # Plot
 cgr.pnc.plt <- ggplot(cgr.pnc.pltdf, aes(Herbicide.Treatment, Panic, color = Herbicide.Treatment)) +
@@ -692,48 +707,8 @@ ugr.pnc.plt <- ggplot(ugr.pnc.pltdf, aes(Herbicide.Treatment, Panic, color = Her
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.pnc.plt
 
-plot_grid(cgr.pnc.plt, ugr.pnc.plt, labels = panel.labs, nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/Panic.pdf", plot = last_plot())
-
-##  -----------------------------------------  ##
-      # Litter Depth (cm) ####
-##  -----------------------------------------  ##
-procD.lm(LitDep ~ Herbicide.Treatment * Year, data = cgr) # yr = sig
-simp.procD(advanced.procD.lm(LitDep ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr))
-  ## 14 = A | 15 = B | 16 = A | 17 = A
-
-procD.lm(LitDep ~ Herbicide.Treatment * Year, data = ugr) # yr = sig
-simp.procD(advanced.procD.lm(LitDep ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = ugr))
-  ## 14 = A | 15 = A | 16 = AB | 17 = B
-
-cgr.ltrdp.pltdf <- summarySE(data = cgr, measurevar = "LitDep", groupvars = c("Year"))
-ugr.ltrdp.pltdf <- summarySE(data = ugr, measurevar = "LitDep", groupvars = c("Year"))
-ltrdp.lims <- minmax(c(cgr.ltrdp.pltdf[,3], ugr.ltrdp.pltdf[,3]), slack = 5)
-
-# Plot
-cgr.ltrdp.plt <- ggplot(cgr.ltrdp.pltdf, aes(Year, LitDep, color = Year)) +
-  geom_errorbar(aes(ymin = LitDep - se, ymax = LitDep + se), width = 0.3, size = 1, position = dodge) +
-  geom_point(stat = 'identity', size = 2, position = dodge) +
-  scale_y_continuous("Litter Depth (cm)", limits = ltrdp.lims) +
-  xlab("Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); cgr.ltrdp.plt
-
-ugr.ltrdp.plt <- ggplot(ugr.ltrdp.pltdf, aes(Year, LitDep, color = Year)) +
-  geom_errorbar(aes(ymin = LitDep - se, ymax = LitDep + se), width = 0.3, size = 1, position = dodge) +
-  geom_point(stat = 'identity', size = 2, position = dodge) +
-  scale_y_continuous("Litter Depth (cm)", limits = ltrdp.lims) +
-  xlab("Un-Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); ugr.ltrdp.plt
-
-plot_grid(cgr.ltrdp.plt, ugr.ltrdp.plt, labels = panel.labs, nrow = 1, ncol = 2)
-ggplot2::ggsave("./Graphs/LitDep.pdf", plot = last_plot())
+plot_grid(cgr.pnc.plt, ugr.pnc.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Graphs/Panic.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
 
 # END ####
-
 
