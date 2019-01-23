@@ -71,18 +71,24 @@ sort(unique(daub.v1$Treatment))
 
 # Make it a factor
 daub.v1$Treatment <- as.factor(daub.v1$Treatment)
+sort(unique(daub.v1$Treatment))
 
 # Let's upgrade the herbicide treatment column now
 daub.v1$Herbicide.Treatment <- herbtrt$Fescue.Treatment[match(daub.v1$Patch, herbtrt$Patch)]
 sort(unique(daub.v1$Herbicide.Treatment))
 
 # Now that you have the new-and-improved treatment designations, ditch all unnecessary columns
-daub.v2 <- daub.v1[,-c(9:10, 24:28)]
+daub.v2 <- daub.v1[,-c(11:12, 26:30, 32)]
   ## Ditched the Excel-calculated Robel average and SD
   ## Also the "Angle_of_O" column
 
 # Check to make sure your b-e-a-utiful columns are not part of what you just ditched
 str(daub.v2)
+
+# Reduce year to just the last two digits (will fit better in the plots eventually)
+sort(unique(daub.v2$Year))
+daub.v2$Year <- gsub("20", "", daub.v2$Year)
+sort(unique(daub.v2$Year))
 
 ##  ---------------------------------------------------------------------------------------------  ##
                   # Format Special Response Variables ####
@@ -121,8 +127,8 @@ str(daub.v2$Litter_dep)
           # Robel Pole (dm)
 ##  ---------------------------------------  ##
 # Calculate Robel averages from the four cardinal direction readings taken
-colnames(daub.v2[,5:8])
-daub.v2$Robel <- as.vector(rowSums(daub.v2[,5:8]) / 4)
+colnames(daub.v2[,7:10])
+daub.v2$Robel <- as.vector(rowSums(daub.v2[,7:10]) / 4)
   ## I know these data are in the raw data file, but Excel is not reproducible and this is
 
 ##  ---------------------------------------------------------------------------------------------  ##
@@ -188,6 +194,7 @@ thresh <- 50
 # Get a new column for "heavy" cover quadrats
 daub.v3$Heavy.Fescue <- ifelse(daub.v3$Fescue > thresh, yes = 1, no = 0)
 daub.v3$Heavy.CSG <- ifelse(daub.v3$CSG > thresh, yes = 1, no = 0)
+daub.v3$Heavy.WSG <- ifelse(daub.v3$WSG > thresh, yes = 1, no = 0)
 
 ##  ---------------------------------------------------------------------------------------------  ##
                         # Get Patch-Level Values ####
@@ -195,7 +202,7 @@ daub.v3$Heavy.CSG <- ifelse(daub.v3$CSG > thresh, yes = 1, no = 0)
 # Get patch-level averages for all the response variables
 daub.v4 <- ddply(daub.v3, 
             c("Pasture_Patch_Year", "Patch", "Pasture", "Year",
-              "Treatment", "Herbicide.Treatment", "TSH"), 
+              "Treatment", "Herbicide.Treatment"), 
             summarise,
             CSG = mean(CSG),
             WSG = mean(WSG),
@@ -210,7 +217,8 @@ daub.v4 <- ddply(daub.v3,
             Panic = mean(Panic),
             LitDep = mean(Litter_dep),
             Hvy.Fesc = sum(Heavy.Fescue),
-            Hvy.CSG = sum(Heavy.CSG))
+            Hvy.CSG = sum(Heavy.CSG),
+            Hvy.WSG = sum(Heavy.WSG))
 
 # Should lose a *lot* of rows
 nrow(daub.v3); nrow(daub.v4)
@@ -235,13 +243,13 @@ sort(unique(herb$Treatment))
   ## Will receive a substantial asterisk in the paper discussion/methods
 
 # Going to do some fancy footwork to make a grouping variable for eventual plotting
-herb$Composite.Variable <- paste0(herb$Year, "-", herb$TSH)
+herb$Composite.Variable <- paste0(herb$Year, "-", herb$Herbicide.Treatment)
 sort(unique(herb$Composite.Variable))
 
 # Re-order
 ncol(herb)
-herb.v2 <- herb[,c(1:7, 22, 8:21)]
-ncol(herb.v2)
+herb.v2 <- herb[,c(1:6, 22, 7:21)]
+ncol(herb.v2) # make sure no columns are dropped
 
 # Save out those this dataframe because it is ready to roll!
 write.csv(herb.v2, "./Data/snsdata.csv", row.names = F)
