@@ -1,7 +1,10 @@
 ##  --------------------------------------------------------------------------------------------------------------------------------------  ##
-# Vegetation Response to Anti-Tall Fescue Herbicide Treatments
+                        # Vegetation Response to Anti-Tall Fescue Herbicide Treatments
 ##  --------------------------------------------------------------------------------------------------------------------------------------  ##
 # Code written by Nicholas J Lyon
+
+# Objective 3
+  ## Structural Response to Treatment
 
 # START ####
 
@@ -23,9 +26,9 @@ rm(list = ls())
 sns <- read.csv("./Data/snsdata.csv")
 
 # Make sure year is considered a factor
-str(sns$Year)
+unique(sns$Year)
 sns$Year <- as.factor(sns$Year)
-str(sns$Year)
+unique(sns$Year)
 
 # Re-level the factors too though
 unique(sns$Herbicide.Treatment)
@@ -37,18 +40,17 @@ cgr <- subset(sns, sns$Treatment == "GB")
 ugr <- subset(sns, sns$Treatment == "None")
 
 # Plotting shortcuts
-yr.labs <- c("2014", "2015", "2016", "2017")
+yr.labs <- c("14", "15", "16", "17", "18")
 sns.labs <- c("Con", "Spr", "SnS")
-yr.colors <- c("2014" = "#969696", "2015" = "#f768a1", "2016" = "#dd3497",
-               "2017" = "#ae017e", "2018" = "#7a0177")
+yr.colors <- c("14" = "#969696", "15" = "#f768a1", "16" = "#dd3497",
+               "17" = "#ae017e", "18" = "#7a0177")
 cgr.colors <- c("Con" = "#d73027", "Spr" = "#f46d43", "SnS" = "#fdae61") # shades of red
 ugr.colors <- c("Con" = "#4575b4", "Spr" = "#74add1", "SnS" = "#abd9e9") # shades of blue
 cgr.ns.color <- "#fdae61"
 ugr.ns.color <- "#abd9e9"
-panel.labs <- c("A)", "B)")
 dodge <- position_dodge(width = 0.5)
-cgr.vlines <- geom_vline(xintercept = c(2014.4, 2014.5, 2014.6, 2017.4), linetype = c(1, 2, 3, 1))
-ugr.vlines <- geom_vline(xintercept = c(2014.5, 2014.6), linetype = c(2, 3))
+cgr.vlines <- geom_vline(xintercept = c(14.4, 14.5, 14.6, 17.4), linetype = c(1, 2, 3, 1))
+ugr.vlines <- geom_vline(xintercept = c(14.5, 14.6), linetype = c(2, 3))
 pref.theme <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                     panel.background = element_blank(), axis.line = element_line(colour = "black"), 
                     legend.title = element_blank())
@@ -266,23 +268,109 @@ minmax <- function(x, dig = 0, slack = 10){
 }
 
 ##  ---------------------------------------------------------------------------------------------  ##
+                                # Bare Cover ####
+##  ---------------------------------------------------------------------------------------------  ##
+anova(lm.rrpp(Bare ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # interxn = NS
+anova(lm.rrpp(Bare ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # yr = sig
+bar.yr.cgr.fit <- lm.rrpp(Bare ~ Year, data = cgr, iter = 9999)
+bar.yr.cgr.pairs <- simp.rrpp(pairwise(bar.yr.cgr.fit, fit.null = NULL, groups = cgr$Year))
+bar.yr.cgr.pairs
+## sig
+
+anova(lm.rrpp(Bare ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # NS
+anova(lm.rrpp(Bare ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
+
+cgr.bar.pltdf <- summarySE(data = cgr, measurevar = "Bare", groupvars = c("Year"))
+ugr.bar.pltdf <- summarySE(data = ugr, measurevar = "Bare", groupvars = c("Herbicide.Treatment"))
+bar.lims <- minmax(c(cgr.bar.pltdf[,3], ugr.bar.pltdf[,3]))
+
+# Plot
+cgr.bar.plt <- ggplot(cgr.bar.pltdf, aes(Year, Bare, color = Year)) +
+  geom_errorbar(aes(ymin = Bare - se, ymax = Bare + se), width = 0.3, size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2, position = dodge) +
+  scale_y_continuous("Bare % Cover", limits = bar.lims) +
+  xlab("Grazed") +
+  scale_color_manual(values = yr.colors) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),
+        legend.position = "none", legend.title = element_blank()); cgr.bar.plt
+
+ugr.bar.plt <- ggplot(ugr.bar.pltdf, aes(Herbicide.Treatment, Bare, color = Herbicide.Treatment)) +
+  geom_errorbar(aes(ymin = Bare - se, ymax = Bare + se), width = 0.3, size = 1, position = dodge) +
+  geom_point(position = 'identity', size = 2.5) +
+  xlab("Grazed") +
+  scale_y_continuous("Bare % Cover", limits = bar.lims) +
+  scale_color_manual(values = ugr.colors) +
+  scale_x_discrete(limits = sns.labs, labels = sns.labs) +
+  pref.theme + theme(legend.position = "none"); ugr.bar.plt
+
+plot_grid(cgr.bar.plt, ugr.bar.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Graphs/Bare.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
+
+##  ---------------------------------------------------------------------------------------------  ##
+                              # Litter Cover ####
+##  ---------------------------------------------------------------------------------------------  ##
+anova(lm.rrpp(Litter ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # interxn = NS
+anova(lm.rrpp(Litter ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # yr = sig
+ltr.yr.cgr.fit <- lm.rrpp(Litter ~ Year, data = cgr, iter = 9999)
+ltr.yr.cgr.pairs <- simp.rrpp(pairwise(ltr.yr.cgr.fit, fit.null = NULL, groups = cgr$Year))
+ltr.yr.cgr.pairs
+## sig
+
+anova(lm.rrpp(Litter ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # NS
+anova(lm.rrpp(Litter ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
+
+cgr.ltr.pltdf <- summarySE(data = cgr, measurevar = "Litter", groupvars = c("Year", "Herbicide.Treatment"))
+ugr.ltr.pltdf <- summarySE(data = ugr, measurevar = "Litter", groupvars = c("Year"))
+ltr.lims <- minmax(c(cgr.ltr.pltdf[,4], ugr.ltr.pltdf[,3]))
+
+# Plot
+cgr.ltr.plt <- ggplot(cgr.ltr.pltdf, aes(Herbicide.Treatment, Litter, color = Year)) +
+  geom_errorbar(aes(ymin = Litter - se, ymax = Litter + se), width = 0.3, size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2, position = dodge) +
+  scale_y_continuous("Litter % Cover", limits = ltr.lims) +
+  xlab("Grazed") +
+  scale_color_manual(values = yr.colors) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),
+        legend.position = "none", legend.title = element_blank()); cgr.ltr.plt
+
+ugr.ltr.plt <- ggplot(ugr.ltr.pltdf, aes(Year, Litter, color = Year)) +
+  geom_errorbar(aes(ymin = Litter - se, ymax = Litter + se), width = 0.3, size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2, position = dodge) +
+  scale_y_continuous("Litter % Cover", limits = ltr.lims) +
+  xlab("Un-Grazed") +
+  scale_color_manual(values = yr.colors) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),
+        legend.position = "none", legend.title = element_blank()); ugr.ltr.plt
+
+plot_grid(cgr.ltr.plt, ugr.ltr.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Graphs/Litter.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
+
+##  ---------------------------------------------------------------------------------------------  ##
                               # Robel (dm) ####
 ##  ---------------------------------------------------------------------------------------------  ##
-procD.lm(Robel ~ Herbicide.Treatment * Year, data = cgr) # NS
+anova(lm.rrpp(Robel ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # NS
+anova(lm.rrpp(Robel ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # NS
+rbl.yr.cgr.fit <- lm.rrpp(Robel ~ Year, data = cgr, iter = 9999)
+rbl.yr.cgr.pairs <- simp.rrpp(pairwise(rbl.yr.cgr.fit, fit.null = NULL, groups = cgr$Year))
+rbl.yr.cgr.pairs
 
-procD.lm(Robel ~ Herbicide.Treatment * Year, data = ugr) # NS
+anova(lm.rrpp(Robel ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # NS
+anova(lm.rrpp(Robel ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
 
-cgr.rbl.pltdf <- summarySE(data = cgr, measurevar = "Robel", groupvars = c("Herbicide.Treatment"))
+cgr.rbl.pltdf <- summarySE(data = cgr, measurevar = "Robel", groupvars = c("Year"))
 ugr.rbl.pltdf <- summarySE(data = ugr, measurevar = "Robel", groupvars = c("Herbicide.Treatment"))
 rbl.lims <- minmax(c(cgr.rbl.pltdf[,3], ugr.rbl.pltdf[,3]), slack = 1)
 
 # Plot
-cgr.rbl.plt <- ggplot(cgr.rbl.pltdf, aes(Herbicide.Treatment, Robel, color = Herbicide.Treatment)) +
-  geom_errorbar(aes(ymin = Robel - se, ymax = Robel + se), width = 0.3, size = 1) +
-  geom_point(stat = 'identity', size = 2) +
-  scale_y_continuous("Robel % Cover", limits = rbl.lims) +
+cgr.rbl.plt <- ggplot(cgr.rbl.pltdf, aes(Year, Robel, color = Year)) +
+  geom_errorbar(aes(ymin = Robel - se, ymax = Robel + se), width = 0.3, size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2, position = dodge) +
+  scale_y_continuous("Robel Height (dm)", limits = rbl.lims) +
   xlab("Grazed") +
-  scale_color_manual(values = cgr.colors) +
+  scale_color_manual(values = yr.colors) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); cgr.rbl.plt
@@ -290,26 +378,27 @@ cgr.rbl.plt <- ggplot(cgr.rbl.pltdf, aes(Herbicide.Treatment, Robel, color = Her
 ugr.rbl.plt <- ggplot(ugr.rbl.pltdf, aes(Herbicide.Treatment, Robel, color = Herbicide.Treatment)) +
   geom_errorbar(aes(ymin = Robel - se, ymax = Robel + se), width = 0.3, size = 1) +
   geom_point(stat = 'identity', size = 2) +
-  scale_y_continuous("Robel % Cover", limits = rbl.lims) +
+  scale_y_continuous("Robel Height (dm)", limits = rbl.lims) +
   xlab("Un-Grazed") +
   scale_color_manual(values = ugr.colors) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.rbl.plt
 
-plot_grid(cgr.rbl.plt, ugr.rbl.plt, labels = panel.labs, nrow = 1, ncol = 2)
+plot_grid(cgr.rbl.plt, ugr.rbl.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/Robel.pdf", plot = last_plot())
 
 ##  ---------------------------------------------------------------------------------------------  ##
                           # Litter Depth (cm) ####
 ##  ---------------------------------------------------------------------------------------------  ##
-procD.lm(LitDep ~ Herbicide.Treatment * Year, data = cgr) # yr = sig
-simp.procD(advanced.procD.lm(LitDep ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = cgr))
-## 14 = A | 15 = B | 16 = A | 17 = A
+anova(lm.rrpp(LitDep ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # NS
+anova(lm.rrpp(LitDep ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # NS
 
-procD.lm(LitDep ~ Herbicide.Treatment * Year, data = ugr) # yr = sig
-simp.procD(advanced.procD.lm(LitDep ~ Herbicide.Treatment + Year, ~ 1, ~ Year, data = ugr))
-## 14 = A | 15 = A | 16 = AB | 17 = B
+anova(lm.rrpp(LitDep ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # NS
+anova(lm.rrpp(LitDep ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
+ltrdp.yr.ugr.fit <- lm.rrpp(LitDep ~ Year, data = ugr, iter = 9999)
+ltrdp.yr.ugr.pairs <- simp.rrpp(pairwise(ltrdp.yr.ugr.fit, fit.null = NULL, groups = ugr$Year))
+ltrdp.yr.ugr.pairs
 
 cgr.ltrdp.pltdf <- summarySE(data = cgr, measurevar = "LitDep", groupvars = c("Year"))
 ugr.ltrdp.pltdf <- summarySE(data = ugr, measurevar = "LitDep", groupvars = c("Year"))
@@ -336,7 +425,7 @@ ugr.ltrdp.plt <- ggplot(ugr.ltrdp.pltdf, aes(Year, LitDep, color = Year)) +
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
         legend.position = "none", legend.title = element_blank()); ugr.ltrdp.plt
 
-plot_grid(cgr.ltrdp.plt, ugr.ltrdp.plt, labels = panel.labs, nrow = 1, ncol = 2)
+plot_grid(cgr.ltrdp.plt, ugr.ltrdp.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
 ggplot2::ggsave("./Graphs/LitDep.pdf", plot = last_plot())
 
 
