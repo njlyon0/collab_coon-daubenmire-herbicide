@@ -275,7 +275,7 @@ anova(lm.rrpp(Bare ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effec
 bar.yr.cgr.fit <- lm.rrpp(Bare ~ Year, data = cgr, iter = 9999)
 bar.yr.cgr.pairs <- simp.rrpp(pairwise(bar.yr.cgr.fit, fit.null = NULL, groups = cgr$Year))
 bar.yr.cgr.pairs
-## sig
+## NS
 
 anova(lm.rrpp(Bare ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Bare ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
