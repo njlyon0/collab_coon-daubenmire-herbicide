@@ -127,6 +127,7 @@ fsc.lims <- c(0, 60)
 # Plot
 cgr.fsc.plt <- ggplot(cgr.fsc.pltdf, aes(Year, Fescue, color = rep.int("x", nrow(cgr.fsc.pltdf)))) +
   geom_errorbar(aes(ymin = Fescue - se, ymax = Fescue + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(cgr.fsc.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
   labs(x = "Year", y = "Fescue % Cover") +
   scale_y_continuous(limits = fsc.lims) +
@@ -140,6 +141,7 @@ cgr.fsc.plt <- ggplot(cgr.fsc.pltdf, aes(Year, Fescue, color = rep.int("x", nrow
 
 ugr.fsc.plt <- ggplot(ugr.fsc.pltdf, aes(Year, Fescue, color = rep.int("x", nrow(cgr.fsc.pltdf)))) +
   geom_errorbar(aes(ymin = Fescue - se, ymax = Fescue + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(ugr.fsc.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
   labs(x = "Year", y = " ") +
   scale_y_continuous(limits = fsc.lims) +
@@ -159,7 +161,7 @@ smx.lims <- c(0, 0.15)
 # Plots
 cgr.smx.plt <- ggplot(cgr.smx.pltdf, aes(Year, Seedmix, color = rep.int("x", nrow(cgr.smx.pltdf)))) +
   geom_errorbar(aes(ymax = Seedmix + se, ymin = Seedmix - se), position = dodge, width = 0.3) +
-  geom_line(aes(group = rep.int("Z", nrow(cgr.smx.pltdf))), size = 1, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(cgr.smx.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2.5, position = dodge) +
   labs(x = "Year", y = "Proportion >25% Seed-mix") +
   geom_text(label = "A", x = 13.75, y = 0.01, color = "black") +
@@ -171,8 +173,9 @@ cgr.smx.plt <- ggplot(cgr.smx.pltdf, aes(Year, Seedmix, color = rep.int("x", nro
   scale_color_manual(values = cgr.ns.color) +
   pref.theme +   cgr.vlines + theme(legend.position = "none"); cgr.smx.plt
 
-ugr.smx.plt <- ggplot(ugr.smx.pltdf, aes(Year, Seedmix, color = rep.int("x", nrow(cgr.smx.pltdf)))) +
+ugr.smx.plt <- ggplot(ugr.smx.pltdf, aes(Year, Seedmix, color = rep.int("x", nrow(ugr.smx.pltdf)))) +
   geom_errorbar(aes(ymin = Seedmix - se, ymax = Seedmix + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(ugr.smx.pltdf))), size = 1, position = dodge) +
   geom_point(position = 'identity', size = 2.5) +
   labs(x = "Year", y = " ") +
   scale_y_continuous(limits = smx.lims) +
@@ -241,6 +244,7 @@ lgm.lims <- c(10, 35)
 # Plot
 cgr.lgm.plt <- ggplot(cgr.lgm.pltdf, aes(Year, Legumes, color = rep.int("x", nrow(cgr.lgm.pltdf)))) +
   geom_errorbar(aes(ymin = Legumes - se, ymax = Legumes + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(cgr.lgm.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
   labs(x = "Year", y = "Legumes % Cover") +
   scale_y_continuous(limits = lgm.lims) +
@@ -254,6 +258,7 @@ cgr.lgm.plt <- ggplot(cgr.lgm.pltdf, aes(Year, Legumes, color = rep.int("x", nro
 
 ugr.lgm.plt <- ggplot(ugr.lgm.pltdf, aes(Year, Legumes, color = rep.int("x", nrow(cgr.lgm.pltdf)))) +
   geom_errorbar(aes(ymin = Legumes - se, ymax = Legumes + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(ugr.lgm.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
   labs(x = "Year", y = " ") +
   scale_y_continuous(limits = lgm.lims) +
@@ -284,6 +289,7 @@ cgr.wdy.plt <- ggplot(cgr.wdy.pltdf, aes(Herbicide.Treatment, Woody, color = Her
 
 ugr.wdy.plt <- ggplot(ugr.wdy.pltdf, aes(Year, Woody, color = rep.int("x", nrow(ugr.wdy.pltdf)))) +
   geom_errorbar(aes(ymin = Woody - se, ymax = Woody + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(ugr.wdy.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
   labs(x = "Year", y = " ") +
   geom_text(label = "A", x = 13.75, y = 0.4, color = "black") +
@@ -309,14 +315,16 @@ pnc.lims <- c(0, 0.6)
 # Plot
 cgr.pnc.plt <- ggplot(cgr.pnc.pltdf, aes(Year, Panic, color = rep.int("x", nrow(cgr.pnc.pltdf)))) +
   geom_errorbar(aes(ymin = Panic - se, ymax = Panic + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(cgr.pnc.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
   labs(x = "Year", y = "Panic Proportion Present") +
   scale_y_continuous(limits = pnc.lims) +
   scale_color_manual(values = cgr.ns.color) +
   pref.theme + cgr.vlines + theme(legend.position = "none"); cgr.pnc.plt
 
-ugr.pnc.plt <- ggplot(ugr.pnc.pltdf, aes(Year, Panic, color = rep.int("x", nrow(cgr.pnc.pltdf)))) +
+ugr.pnc.plt <- ggplot(ugr.pnc.pltdf, aes(Year, Panic, color = rep.int("x", nrow(ugr.pnc.pltdf)))) +
   geom_errorbar(aes(ymin = Panic - se, ymax = Panic + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(ugr.pnc.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
   labs(x = "Year", y = " ") +
   scale_y_continuous(limits = pnc.lims) +
@@ -333,27 +341,29 @@ ggplot2::ggsave("./Figures/Panic.pdf", width = 6, height = 4, units = 'in', plot
                     # Heavy CSG ####
 ##  -------------------------------------------------------------------------  ##
 # Get summary stats for plotting
-cgr.hvy.csg.pltdf <- summarySE(data = cgr, measurevar = "Hvy.CSG", groupvars = c("Herbicide.Treatment"))
-ugr.hvy.csg.pltdf <- summarySE(data = ugr, measurevar = "Hvy.CSG", groupvars = c("Herbicide.Treatment"))
-hvy.csg.lims <- minmax(c(cgr.hvy.csg.pltdf[,3], ugr.hvy.csg.pltdf[,3]))
+cgr.hvy.csg.pltdf <- summarySE(data = cgr, measurevar = "Hvy.CSG", groupvars ="Year")
+ugr.hvy.csg.pltdf <- summarySE(data = ugr, measurevar = "Hvy.CSG", groupvars = "Herbicide.Treatment")
+hvy.csg.lims <- c(0, 16)
 
 # Plots
-cgr.hvy.csg.plt <- ggplot(cgr.hvy.csg.pltdf, aes(Herbicide.Treatment, Hvy.CSG, color = Herbicide.Treatment)) +
-  geom_errorbar(aes(ymin = Hvy.CSG - se, ymax = Hvy.CSG + se), width = 0.3, size = 1, position = dodge) +
+cgr.hvy.csg.plt <- ggplot(cgr.hvy.csg.pltdf, aes(Year, Hvy.CSG, color = rep.int("x", nrow(cgr.hvy.csg.pltdf)))) +
+  geom_errorbar(aes(ymin = Hvy.CSG - se, ymax = Hvy.CSG + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(cgr.hvy.csg.pltdf))), size = 1, position = dodge) +
   geom_point(position = 'identity', size = 2.5) +
-  xlab("Grazed") +
-  scale_y_continuous("# Quadrats ≥ 50% CSG", limits = hvy.csg.lims) +
-  scale_color_manual(values = cgr.colors) +
-  scale_x_discrete(limits = sns.labs, labels = sns.labs) +
-  pref.theme + theme(legend.position = "none"); cgr.hvy.csg.plt
+  labs(x = "Year", y = "# Quadrats >50% CSG") +
+  scale_y_continuous(limits = hvy.csg.lims) +
+  scale_color_manual(values = cgr.ns.color) +
+  pref.theme + cgr.vlines + theme(legend.position = "none"); cgr.hvy.csg.plt
 
 ugr.hvy.csg.plt <- ggplot(ugr.hvy.csg.pltdf, aes(Herbicide.Treatment, Hvy.CSG, color = Herbicide.Treatment)) +
-  geom_errorbar(aes(ymin = Hvy.CSG - se, ymax = Hvy.CSG + se), width = 0.3, size = 1, position = dodge) +
+  geom_errorbar(aes(ymin = Hvy.CSG - se, ymax = Hvy.CSG + se), width = 0.3, position = dodge) +
   geom_point(position = 'identity', size = 2.5) +
-  xlab("Un-Grazed") +
-  scale_y_continuous("# Quadrats ≥ 50% CSG", limits = hvy.csg.lims) +
+  labs(x = "Herbicide Treatment", y = " ") +
+  geom_text(label = "A", x = 0.8, y = 13.3, color = "black") +
+  geom_text(label = "AB", x = 1.7, y = 7.2, color = "black") +
+  geom_text(label = "B", x = 2.8, y = 3.8, color = "black") +
+  scale_y_continuous(limits = hvy.csg.lims) +
   scale_color_manual(values = ugr.colors) +
-  scale_x_discrete(limits = sns.labs, labels = sns.labs) +
   pref.theme + theme(legend.position = "none"); ugr.hvy.csg.plt
 
 # Save it
@@ -364,29 +374,28 @@ ggplot2::ggsave("./Figures/Hvy_CSG.pdf", width = 6, height = 4, units = 'in', pl
                     # Heavy WSG ####
 ##  -------------------------------------------------------------------------  ##
 # Get summary stats for plotting
-cgr.hvy.wsg.pltdf <- summarySE(data = cgr, measurevar = "Hvy.WSG", groupvars = c("Herbicide.Treatment"))
+cgr.hvy.wsg.pltdf <- summarySE(data = cgr, measurevar = "Hvy.WSG", groupvars = "Year")
 ugr.hvy.wsg.pltdf <- summarySE(data = ugr, measurevar = "Hvy.WSG", groupvars = c("Year", "Herbicide.Treatment"))
-ugr.hvy.wsg.pltdf$Year <- as.numeric(as.character(ugr.hvy.wsg.pltdf$Year))
-hvy.wsg.lims <- minmax(c(cgr.hvy.wsg.pltdf[,3], ugr.hvy.wsg.pltdf[,3]), slack = 10)
+wsg.lims <- c(0, 15)
 
 # Plots
-cgr.hvy.wsg.plt <- ggplot(cgr.hvy.wsg.pltdf, aes(Herbicide.Treatment, Hvy.WSG, color = Herbicide.Treatment)) +
-  geom_errorbar(aes(ymin = Hvy.WSG - se, ymax = Hvy.WSG + se), width = 0.3, size = 1, position = dodge) +
+cgr.hvy.wsg.plt <- ggplot(cgr.hvy.wsg.pltdf, aes(Year, Hvy.WSG, color = rep.int("x", nrow(cgr.hvy.wsg.pltdf)))) +
+  geom_errorbar(aes(ymin = Hvy.WSG - se, ymax = Hvy.WSG + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(cgr.hvy.wsg.pltdf))), size = 1, position = dodge) +
   geom_point(position = 'identity', size = 2.5) +
-  xlab("Grazed") +
-  scale_y_continuous("# Quadrats ≥ 50% WSG", limits = hvy.wsg.lims) +
-  scale_color_manual(values = cgr.colors) +
-  scale_x_discrete(limits = sns.labs, labels = sns.labs) +
-  pref.theme + theme(legend.position = "none"); cgr.hvy.wsg.plt
+  labs(x = "Year", y = "# Quadrats >50% WSG") +
+  scale_y_continuous(limits = wsg.lims) +
+  scale_color_manual(values = cgr.ns.color) +
+  pref.theme + cgr.vlines + theme(legend.position = "none"); cgr.hvy.wsg.plt
 
 ugr.hvy.wsg.plt <- ggplot(ugr.hvy.wsg.pltdf, aes(Year, Hvy.WSG, color = Herbicide.Treatment)) +
+  geom_errorbar(aes(ymax = Hvy.WSG + se, ymin = Hvy.WSG - se), position = dodge, width = 0.3) +
   geom_line(aes(group = Herbicide.Treatment), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2.5, position = dodge) +
-  geom_errorbar(aes(ymax = Hvy.WSG + se, ymin = Hvy.WSG - se), position = dodge, width = 0.3) +
-  scale_y_continuous("# Quadrats ≥ 50% WSG", limits = hvy.wsg.lims) +
+  labs(x = "Year", y = " ") +
+  scale_y_continuous(limits = wsg.lims) +
   scale_color_manual(values = ugr.colors) +
-  ugr.vlines + pref.theme + 
-  theme(legend.position = c(0.65, 0.9)); ugr.hvy.wsg.plt
+  ugr.vlines + pref.theme + theme(legend.position = c(0.2, 0.9)); ugr.hvy.wsg.plt
 
 # Save it.
 plot_grid(cgr.hvy.wsg.plt, ugr.hvy.wsg.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
@@ -395,32 +404,37 @@ ggplot2::ggsave("./Figures/Hvy.WSG.pdf", width = 6, height = 4, units = 'in', pl
 ##  -------------------------------------------------------------------------  ##
                       # Heavy Fescue ####
 ##  -------------------------------------------------------------------------  ##
-cgr.hvy.fsc.pltdf <- summarySE(data = cgr, measurevar = "Hvy.Fesc", groupvars = c("Year"))
-ugr.hvy.fsc.pltdf <- summarySE(data = ugr, measurevar = "Hvy.Fesc", groupvars = c("Herbicide.Treatment"))
-hvy.fsc.lims <- minmax(c(cgr.hvy.fsc.pltdf[,4], ugr.hvy.fsc.pltdf[,4]), slack = 20)
+# Plotting dataframes
+cgr.hvy.fsc.pltdf <- summarySE(data = cgr, measurevar = "Hvy.Fesc", groupvars = "Year")
+ugr.hvy.fsc.pltdf <- summarySE(data = ugr, measurevar = "Hvy.Fesc", groupvars = "Year")
+hvy.fsc.lims <- c(0, 17)
 
 # Plot
-cgr.hvy.fsc.plt <- ggplot(cgr.hvy.fsc.pltdf, aes(Year, Hvy.Fesc, color = Year)) +
-  geom_errorbar(aes(ymin = Hvy.Fesc - se, ymax = Hvy.Fesc + se), width = 0.3, size = 1, position = dodge) +
+cgr.hvy.fsc.plt <- ggplot(cgr.hvy.fsc.pltdf, aes(Year, Hvy.Fesc, color = rep.int("x", nrow(cgr.hvy.fsc.pltdf)))) +
+  geom_errorbar(aes(ymin = Hvy.Fesc - se, ymax = Hvy.Fesc + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(cgr.hvy.fsc.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
-  scale_y_continuous("# Quadrats ≥ 50% Fescue", limits = hvy.fsc.lims) +
-  xlab("Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); cgr.hvy.fsc.plt
+  labs(x = "Year", y = "# Quadrats >50% Fescue") +
+  scale_y_continuous(limits = hvy.fsc.lims) +
+  geom_text(label = "A", x = 13.75, y = 13.2, color = "black") +
+  geom_text(label = "AB", x = 15.35, y = 8.3, color = "black") +
+  geom_text(label = "B", x = 15.75, y = 5.0, color = "black") +
+  geom_text(label = "B", x = 16.75, y = 2.6, color = "black") +
+  geom_text(label = "B", x = 17.75, y = 3.1, color = "black") +
+  scale_color_manual(values = cgr.ns.color) +
+  pref.theme + cgr.vlines + theme(legend.position = "none"); cgr.hvy.fsc.plt
 
-ugr.hvy.fsc.plt <- ggplot(ugr.hvy.fsc.pltdf, aes(Herbicide.Treatment, Hvy.Fesc, color = Herbicide.Treatment)) +
-  geom_errorbar(aes(ymin = Hvy.Fesc - se, ymax = Hvy.Fesc + se), width = 0.3, size = 1, position = dodge) +
-  geom_point(position = 'identity', size = 2.5) +
-  xlab("Un-Grazed") +
-  scale_y_continuous("# Quadrats ≥ 50% Fescue", limits = hvy.fsc.lims) +
-  scale_color_manual(values = ugr.colors) +
-  scale_x_discrete(limits = sns.labs, labels = sns.labs) +
-  pref.theme + theme(legend.position = "none"); ugr.hvy.fsc.plt
+ugr.hvy.fsc.plt <- ggplot(ugr.hvy.fsc.pltdf, aes(Year, Hvy.Fesc, color = rep.int("x", nrow(cgr.hvy.fsc.pltdf)))) +
+  geom_errorbar(aes(ymin = Hvy.Fesc - se, ymax = Hvy.Fesc + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(ugr.hvy.fsc.pltdf))), size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2, position = dodge) +
+  labs(x = "Year", y = " ") +
+  scale_y_continuous(limits = hvy.fsc.lims) +
+  scale_color_manual(values = ugr.ns.color) +
+  pref.theme + ugr.vlines + theme(legend.position = "none"); ugr.hvy.fsc.plt
 
 plot_grid(cgr.hvy.fsc.plt, ugr.hvy.fsc.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
-ggplot2::ggsave("./Figures/Hvy.Fesc.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
+ggplot2::ggsave("./Figures/Hvy.Fsc.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
 
 ##  ---------------------------------------------------------------------------------------------  ##
                 # Objective # 3  --- Structural Response ####
@@ -428,29 +442,28 @@ ggplot2::ggsave("./Figures/Hvy.Fesc.pdf", width = 6, height = 4, units = 'in', p
 ##  -------------------------------------------------------------------------  ##
                         # Bare Cover ####
 ##  -------------------------------------------------------------------------  ##
-cgr.bar.pltdf <- summarySE(data = cgr, measurevar = "Bare", groupvars = c("Year"))
-ugr.bar.pltdf <- summarySE(data = ugr, measurevar = "Bare", groupvars = c("Herbicide.Treatment"))
-bar.lims <- minmax(c(cgr.bar.pltdf[,3], ugr.bar.pltdf[,3]))
+cgr.bar.pltdf <- summarySE(data = cgr, measurevar = "Bare", groupvars = "Year")
+ugr.bar.pltdf <- summarySE(data = ugr, measurevar = "Bare", groupvars = "Year")
+bar.lims <- c(5, 50)
 
 # Plot
-cgr.bar.plt <- ggplot(cgr.bar.pltdf, aes(Year, Bare, color = Year)) +
-  geom_errorbar(aes(ymin = Bare - se, ymax = Bare + se), width = 0.3, size = 1, position = dodge) +
+cgr.bar.plt <- ggplot(cgr.bar.pltdf, aes(Year, Bare, color = rep.int("x", nrow(cgr.bar.pltdf)))) +
+  geom_errorbar(aes(ymin = Bare - se, ymax = Bare + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(cgr.bar.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
-  scale_y_continuous("Bare % Cover", limits = bar.lims) +
-  xlab("Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); cgr.bar.plt
+  labs(x = "Year", y = "Bare % Cover") +
+  scale_y_continuous(limits = bar.lims) +
+  scale_color_manual(values = cgr.ns.color) +
+  pref.theme + cgr.vlines + theme(legend.position = "none"); cgr.bar.plt
 
-ugr.bar.plt <- ggplot(ugr.bar.pltdf, aes(Herbicide.Treatment, Bare, color = Herbicide.Treatment)) +
-  geom_errorbar(aes(ymin = Bare - se, ymax = Bare + se), width = 0.3, size = 1, position = dodge) +
-  geom_point(position = 'identity', size = 2.5) +
-  xlab("Grazed") +
-  scale_y_continuous("Bare % Cover", limits = bar.lims) +
-  scale_color_manual(values = ugr.colors) +
-  scale_x_discrete(limits = sns.labs, labels = sns.labs) +
-  pref.theme + theme(legend.position = "none"); ugr.bar.plt
+ugr.bar.plt <- ggplot(ugr.bar.pltdf, aes(Year, Bare, color = rep.int("x", nrow(ugr.bar.pltdf)))) +
+  geom_errorbar(aes(ymin = Bare - se, ymax = Bare + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(ugr.bar.pltdf))), size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2, position = dodge) +
+  labs(x = "Year", y = " ") +
+  scale_y_continuous(limits = bar.lims) +
+  scale_color_manual(values = ugr.ns.color) +
+  pref.theme + ugr.vlines + theme(legend.position = "none"); ugr.bar.plt
 
 plot_grid(cgr.bar.plt, ugr.bar.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
 ggplot2::ggsave("./Figures/Bare.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
@@ -458,30 +471,33 @@ ggplot2::ggsave("./Figures/Bare.pdf", width = 6, height = 4, units = 'in', plot 
 ##  -------------------------------------------------------------------------  ##
                     # Litter Cover ####
 ##  -------------------------------------------------------------------------  ##
-cgr.ltr.pltdf <- summarySE(data = cgr, measurevar = "Litter", groupvars = c("Year", "Herbicide.Treatment"))
-ugr.ltr.pltdf <- summarySE(data = ugr, measurevar = "Litter", groupvars = c("Year"))
-ltr.lims <- minmax(c(cgr.ltr.pltdf[,4], ugr.ltr.pltdf[,3]))
+cgr.ltr.pltdf <- summarySE(data = cgr, measurevar = "Litter", groupvars = "Year")
+ugr.ltr.pltdf <- summarySE(data = ugr, measurevar = "Litter", groupvars = "Year")
+ltr.lims <- c(15, 100)
 
 # Plot
-cgr.ltr.plt <- ggplot(cgr.ltr.pltdf, aes(Herbicide.Treatment, Litter, color = Year)) +
-  geom_errorbar(aes(ymin = Litter - se, ymax = Litter + se), width = 0.3, size = 1, position = dodge) +
+cgr.ltr.plt <- ggplot(cgr.ltr.pltdf, aes(Year, Litter, color = rep.int("x", nrow(cgr.ltr.pltdf)))) +
+  geom_errorbar(aes(ymin = Litter - se, ymax = Litter + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(cgr.ltr.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
-  scale_y_continuous("Litter % Cover", limits = ltr.lims) +
-  xlab("Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); cgr.ltr.plt
+  labs(x = "Year", y = "Litter % Cover") +
+  geom_text(label = "A", x = 13.75, y = 76, color = "black") +
+  geom_text(label = "B", x = 15.2, y = 33, color = "black") +
+  geom_text(label = "AB", x = 15.7, y = 58, color = "black") +
+  geom_text(label = "B", x = 16.8, y = 82, color = "black") +
+  geom_text(label = "AB", x = 18.25, y = 59, color = "black") +
+  scale_y_continuous(limits = ltr.lims) +
+  scale_color_manual(values = cgr.ns.color) +
+  pref.theme + cgr.vlines + theme(legend.position = "none"); cgr.ltr.plt
 
-ugr.ltr.plt <- ggplot(ugr.ltr.pltdf, aes(Year, Litter, color = Year)) +
-  geom_errorbar(aes(ymin = Litter - se, ymax = Litter + se), width = 0.3, size = 1, position = dodge) +
+ugr.ltr.plt <- ggplot(ugr.ltr.pltdf, aes(Year, Litter, color = rep.int("x", nrow(cgr.ltr.pltdf)))) +
+  geom_errorbar(aes(ymin = Litter - se, ymax = Litter + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(ugr.ltr.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
-  scale_y_continuous("Litter % Cover", limits = ltr.lims) +
-  xlab("Un-Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); ugr.ltr.plt
+  labs(x = "Year", y = " ") +
+  scale_y_continuous(limits = ltr.lims) +
+  scale_color_manual(values = ugr.ns.color) +
+  pref.theme + ugr.vlines + theme(legend.position = "none"); ugr.ltr.plt
 
 plot_grid(cgr.ltr.plt, ugr.ltr.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
 ggplot2::ggsave("./Figures/Litter.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
@@ -489,62 +505,69 @@ ggplot2::ggsave("./Figures/Litter.pdf", width = 6, height = 4, units = 'in', plo
 ##  -------------------------------------------------------------------------  ##
                   # Robel Height (dm) ####
 ##  -------------------------------------------------------------------------  ##
-cgr.rbl.pltdf <- summarySE(data = cgr, measurevar = "Robel", groupvars = c("Year"))
-ugr.rbl.pltdf <- summarySE(data = ugr, measurevar = "Robel", groupvars = c("Herbicide.Treatment"))
-rbl.lims <- minmax(c(cgr.rbl.pltdf[,3], ugr.rbl.pltdf[,3]), slack = 1)
+# Plotting dataframes
+cgr.rbl.pltdf <- summarySE(data = cgr, measurevar = "Robel", groupvars = "Year")
+ugr.rbl.pltdf <- summarySE(data = ugr, measurevar = "Robel", groupvars = "Year")
+rbl.lims <- c(1, 10)
 
 # Plot
-cgr.rbl.plt <- ggplot(cgr.rbl.pltdf, aes(Year, Robel, color = Year)) +
-  geom_errorbar(aes(ymin = Robel - se, ymax = Robel + se), width = 0.3, size = 1, position = dodge) +
+cgr.rbl.plt <- ggplot(cgr.rbl.pltdf, aes(Year, Robel, color = rep.int("x", nrow(cgr.rbl.pltdf)))) +
+  geom_errorbar(aes(ymin = Robel - se, ymax = Robel + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(cgr.rbl.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
-  scale_y_continuous("Robel Height (dm)", limits = rbl.lims) +
-  xlab("Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); cgr.rbl.plt
+  labs(x = "Year", y = "Robel % Cover") +
+  scale_y_continuous(limits = rbl.lims) +
+  geom_text(label = "A", x = 13.75, y = 2, color = "black") +
+  geom_text(label = "AB", x = 15.35, y = 2, color = "black") +
+  geom_text(label = "AB", x = 15.6, y = 3.5, color = "black") +
+  geom_text(label = "B", x = 16.75, y = 3.9, color = "black") +
+  geom_text(label = "AB", x = 17.75, y = 3.6, color = "black") +
+  scale_color_manual(values = cgr.ns.color) +
+  pref.theme + cgr.vlines + theme(legend.position = "none"); cgr.rbl.plt
 
-ugr.rbl.plt <- ggplot(ugr.rbl.pltdf, aes(Herbicide.Treatment, Robel, color = Herbicide.Treatment)) +
-  geom_errorbar(aes(ymin = Robel - se, ymax = Robel + se), width = 0.3, size = 1) +
-  geom_point(stat = 'identity', size = 2) +
-  scale_y_continuous("Robel Height (dm)", limits = rbl.lims) +
-  xlab("Un-Grazed") +
-  scale_color_manual(values = ugr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); ugr.rbl.plt
+ugr.rbl.plt <- ggplot(ugr.rbl.pltdf, aes(Year, Robel, color = rep.int("x", nrow(cgr.rbl.pltdf)))) +
+  geom_errorbar(aes(ymin = Robel - se, ymax = Robel + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(ugr.rbl.pltdf))), size = 1, position = dodge) +
+  geom_point(stat = 'identity', size = 2, position = dodge) +
+  labs(x = "Year", y = " ") +
+  scale_y_continuous(limits = rbl.lims) +
+  scale_color_manual(values = ugr.ns.color) +
+  pref.theme + ugr.vlines + theme(legend.position = "none"); ugr.rbl.plt
 
 plot_grid(cgr.rbl.plt, ugr.rbl.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
-ggplot2::ggsave("./Figures/Robel.pdf", plot = last_plot())
+ggplot2::ggsave("./Figures/Robel.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
 
 ##  -------------------------------------------------------------------------  ##
                   # Litter depth (cm) ####
 ##  -------------------------------------------------------------------------  ##
-cgr.ltrdp.pltdf <- summarySE(data = cgr, measurevar = "LitDep", groupvars = c("Year"))
-ugr.ltrdp.pltdf <- summarySE(data = ugr, measurevar = "LitDep", groupvars = c("Year"))
-ltrdp.lims <- minmax(c(cgr.ltrdp.pltdf[,3], ugr.ltrdp.pltdf[,3]), slack = 5)
+cgr.ldp.pltdf <- summarySE(data = cgr, measurevar = "LitDep", groupvars = "Year")
+ugr.ldp.pltdf <- summarySE(data = ugr, measurevar = "LitDep", groupvars = "Year")
+ldp.lims <- c(0, 6)
 
-cgr.ltrdp.plt <- ggplot(cgr.ltrdp.pltdf, aes(Year, LitDep, color = Year)) +
-  geom_errorbar(aes(ymin = LitDep - se, ymax = LitDep + se), width = 0.3, size = 1, position = dodge) +
+cgr.ldp.plt <- ggplot(cgr.ldp.pltdf, aes(Year, LitDep, color = rep.int("x", nrow(cgr.ldp.pltdf)))) +
+  geom_errorbar(aes(ymin = LitDep - se, ymax = LitDep + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(cgr.ldp.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
-  scale_y_continuous("Litter Depth (cm)", limits = ltrdp.lims) +
-  xlab("Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); cgr.ltrdp.plt
+  labs(x = "Year", y = "Litter Depth (cm)") +
+  scale_y_continuous(limits = ldp.lims) +
+  scale_color_manual(values = cgr.ns.color) +
+  pref.theme + cgr.vlines + theme(legend.position = "none"); cgr.ldp.plt
 
-ugr.ltrdp.plt <- ggplot(ugr.ltrdp.pltdf, aes(Year, LitDep, color = Year)) +
-  geom_errorbar(aes(ymin = LitDep - se, ymax = LitDep + se), width = 0.3, size = 1, position = dodge) +
+ugr.ldp.plt <- ggplot(ugr.ldp.pltdf, aes(Year, LitDep, color = rep.int("x", nrow(ugr.ldp.pltdf)))) +
+  geom_errorbar(aes(ymin = LitDep - se, ymax = LitDep + se), width = 0.3, position = dodge) +
+  geom_line(aes(group = rep.int("x", nrow(ugr.ldp.pltdf))), size = 1, position = dodge) +
   geom_point(stat = 'identity', size = 2, position = dodge) +
-  scale_y_continuous("Litter Depth (cm)", limits = ltrdp.lims) +
-  xlab("Un-Grazed") +
-  scale_color_manual(values = yr.colors) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        legend.position = "none", legend.title = element_blank()); ugr.ltrdp.plt
+  labs(x = "Year", y = " ") +
+  geom_text(label = "A", x = 13.75, y = 1.5, color = "black") +
+  geom_text(label = "AB", x = 15.35, y = 1.7, color = "black") +
+  geom_text(label = "AB", x = 15.7, y = 2.5, color = "black") +
+  geom_text(label = "B", x = 16.75, y = 4.5, color = "black") +
+  geom_text(label = "AB", x = 17.75, y = 1.8, color = "black") +
+  scale_y_continuous(limits = ldp.lims) +
+  scale_color_manual(values = ugr.ns.color) +
+  pref.theme + ugr.vlines + theme(legend.position = "none"); ugr.ldp.plt
 
-plot_grid(cgr.ltrdp.plt, ugr.ltrdp.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+plot_grid(cgr.ldp.plt, ugr.ldp.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
 ggplot2::ggsave("./Figures/LitDep.pdf", plot = last_plot())
 
 # END ####
