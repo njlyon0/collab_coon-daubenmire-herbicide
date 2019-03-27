@@ -35,20 +35,6 @@ unique(sns$Herbicide.Treatment)
 cgr <- subset(sns, sns$Treatment == "GB")
 ugr <- subset(sns, sns$Treatment == "None")
 
-# Plotting shortcuts
-yr.labs <- c("15", "16", "17", "18")
-sns.labs <- c("Con", "Spr", "SnS")
-yr.colors <- c("15" = "#f768a1", "16" = "#dd3497", "17" = "#ae017e", "18" = "#7a0177")
-cgr.colors <- c("Con" = "#d73027", "Spr" = "#f46d43", "SnS" = "#fdae61") # shades of red
-ugr.colors <- c("Con" = "#4575b4", "Spr" = "#74add1", "SnS" = "#abd9e9") # shades of blue
-cgr.ns.color <- "#fdae61"
-ugr.ns.color <- "#abd9e9"
-dodge <- position_dodge(width = 0.5)
-cgr.vlines <- geom_vline(xintercept = 17.4, linetype = 1)
-pref.theme <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                    panel.background = element_blank(), axis.line = element_line(colour = "black"), 
-                    legend.title = element_blank())
-
 # Helpful custom functions
   ## Modification of RRPP's summary function to do multiple comparison adjustment as a matter of course
 simp.rrpp <- function (object, test.type = c("dist", "VC", "var"), angle.type = c("rad", "deg"),
@@ -239,25 +225,6 @@ simp.rrpp <- function (object, test.type = c("dist", "VC", "var"), angle.type = 
   
   # And spit out the result
   return(results)
-  
-}
-## Get's min and max values from a supplied vector, good for setting plot limits
-minmax <- function(x, dig = 0, slack = 10){
-  ## x = vector for checking (can be concatenated from multiple sources but must be single object)
-  ## dig = digits to round min and max to (default is 0 to yield integers)
-  ## slack = how much room you want on either end of the true min and max?
-  
-  # Get and round minimum and maximums
-  min.val <- round(min(x), digits = dig)
-  max.val <- round(max(x), digits = dig)
-  
-  # Get 'em into a single value with slack accounted for
-  bounds <- c((min.val - slack), (max.val + slack))
-  
-  # Make sure it can never get below 0
-  bounds[bounds < 0] <- 0
-  
-  return(bounds)
   
 }
 
