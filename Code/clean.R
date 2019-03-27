@@ -9,7 +9,7 @@
 library(plyr); library(stringr)
 
 # Set working directory (Also, "Session" menu to "Set Working Directory" works)
-setwd("~/Documents/School/1. Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
+setwd("~/Documents/School/Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
 
 # Clear environment of other stuff (just in case)
 rm(list = ls())
@@ -19,7 +19,7 @@ hstry <- read.csv("./Data/_Indices/sitehistories.csv")
 herbtrt <- read.csv("./Data/_Indices/sns_index.csv")
 
 # Get raw data
-daub.v0 <- read.csv("./Data/daubdata_raw.csv")
+daub.v0 <- read.csv("./Data/daub-data_raw.csv")
 str(daub.v0)
 
 ##  ---------------------------------------------------------------------------------------------  ##
@@ -224,7 +224,7 @@ daub.v4 <- ddply(daub.v3,
 nrow(daub.v3); nrow(daub.v4)
 
 # Save out this one dataframe with all response variables calculated (just in case)
-write.csv(daub.v4, "./Data/daubdata_clean.csv", row.names = F)
+write.csv(daub.v4, "./Data/daub-data_clean.csv", row.names = F)
 
 ##  ---------------------------------------------------------------------------------------------  ##
                      # Get Project-Specific Dataframe ####
@@ -251,8 +251,22 @@ ncol(herb)
 herb.v2 <- herb[,c(1:6, 22, 7:21)]
 ncol(herb.v2) # make sure no columns are dropped
 
-# Save out those this dataframe because it is ready to roll!
-write.csv(herb.v2, "./Data/snsdata.csv", row.names = F)
+# Save out those this 'full data' dataframe!
+write.csv(herb.v2, "./Data/sns-data_full.csv", row.names = F)
+
+# Subset the big dataframe into three subsets and save them
+  ## 1. 2014 only (to check for absence of pre-treatment differences)
+herb.14 <- subset(herb.v2, Year == "14")
+write.csv(herb.14, "./Data/sns-data_2014.csv", row.names = F)
+
+  ## 2. everything other than 2014 (to evaluate response to treatment)
+herb.pst.trt <- subset(herb.v2, Year != "14")
+write.csv(herb.pst.trt, "./Data/sns-data_post-trt.csv", row.names = F)
+
+  ## 3. 2014 and 2018 only (was there a difference between before and the very end?)
+herb.comp <- subset(herb.v2, Year == "14" | Year == "18")
+write.csv(herb.comp, "./Data/sns-data_14-vs-18.csv", row.names = F)
+
 
 # END ####
 
