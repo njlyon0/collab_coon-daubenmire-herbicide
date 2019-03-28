@@ -13,7 +13,7 @@ library(Rmisc) # get summary values for plotting
 library(ggplot2); library(cowplot) # Plotting
 
 # Set working directory (Also, "Session" menu to "Set Working Directory" works)
-setwd("~/Documents/School/1. Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
+setwd("~/Documents/School/Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
 
 # Clear environment of other stuff
 rm(list = ls())
@@ -22,32 +22,31 @@ rm(list = ls())
                               # Houskeeping ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Pull in the dataset
-sns <- read.csv("./Data/snsdata.csv")
+sns <- read.csv("./Data/sns-data_post-trt.csv")
+sns.14 <- read.csv("./Data/sns-data_2014.csv")
 
-# Re-level the factors too though
-unique(sns$Herbicide.Treatment)
+# Re-level the treatment factor
 sns$Herbicide.Treatment <- factor(as.character(sns$Herbicide.Treatment), levels = c("Con", "Spr", "SnS"))
 unique(sns$Herbicide.Treatment)
+sns.14$Herbicide.Treatment <- factor(as.character(sns.14$Herbicide.Treatment), levels = c("Con", "Spr", "SnS"))
+unique(sns.14$Herbicide.Treatment)
 
 # Further separate into cattle-grazed restorations (CGRs) and un-grazed restorations (UGRs)
 cgr <- subset(sns, sns$Treatment == "GB")
 ugr <- subset(sns, sns$Treatment == "None")
+cgr.14 <- subset(sns.14, sns.14$Treatment == "GB")
+ugr.14 <- subset(sns.14, sns.14$Treatment == "None")
 
 # Plotting shortcuts
-yr.labs <- c("14", "15", "16", "17", "18")
 sns.labs <- c("Con", "Spr", "SnS")
-yr.colors <- c("14" = "#969696", "15" = "#f768a1", "16" = "#dd3497",
-               "17" = "#ae017e", "18" = "#7a0177")
 cgr.colors <- c("Con" = "#d73027", "Spr" = "#f46d43", "SnS" = "#fdae61") # shades of red
 ugr.colors <- c("Con" = "#4575b4", "Spr" = "#74add1", "SnS" = "#abd9e9") # shades of blue
 cgr.ns.color <- "#fdae61"
 ugr.ns.color <- "#abd9e9"
 dodge <- position_dodge(width = 0.5)
-cgr.vlines <- geom_vline(xintercept = c(14.4, 14.6, 17.5), linetype = c(1, 2, 1))
-ugr.vlines <- geom_vline(xintercept = 14.55, linetype = 2)
 pref.theme <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                     panel.background = element_blank(), axis.line = element_line(colour = "black"), 
-                    legend.title = element_blank())
+                    legend.title = element_blank(), legend.position = "none")
 
 ##  ---------------------------------------------------------------------------------------------  ##
               # Objective # 1 --- Functional Group Response ####
@@ -55,43 +54,80 @@ pref.theme <- theme(panel.grid.major = element_blank(), panel.grid.minor = eleme
 ##  -------------------------------------------------------------------------  ##
                           # CSG ####
 ##  -------------------------------------------------------------------------  ##
-# Get summary stats for plotting
-cgr.csg.pltdf <- summarySE(data = cgr, measurevar = "CSG", groupvars = "Year")
-ugr.csg.pltdf <- summarySE(data = ugr, measurevar = "CSG", groupvars = "Herbicide.Treatment")
-csg.lims <- c(10, 50)
+# Plot pre-treatment differences
+cgr.csg14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = CSG, fill = Herbicide.Treatment)) +
+  geom_boxplot(outlier.shape = 21) +
+  geom_text(label = "NS", x = 0.7, y = 55) +
+  scale_fill_manual(values = cgr.colors) +
+  ylim(0, 55) +
+  labs(x = "Un-Grazed", y = "Cool-Season Grass (%)", title = "Pre-Treatment") +
+  pref.theme; cgr.csg14.plt
 
-# Plots
-cgr.csg.plt <- ggplot(cgr.csg.pltdf, aes(Year, CSG, color = rep.int("x", nrow(cgr.csg.pltdf)))) +
-  geom_errorbar(aes(ymin = CSG - se, ymax = CSG + se), width = 0.3, position = dodge) +
-  geom_line(aes(group = rep.int("x", nrow(cgr.csg.pltdf))), size = 1, position = dodge) +
-  geom_point(position = 'identity', size = 2.5) +
-  labs(x = "Year", y = "CSG % Cover") +
-  scale_y_continuous(limits = csg.lims) +
-  scale_color_manual(values = cgr.ns.color) +
-  pref.theme + cgr.vlines + theme(legend.position = "none"); cgr.csg.plt
+ugr.csg14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = CSG, fill = Herbicide.Treatment)) +
+  geom_boxplot(outlier.shape = 21) +
+  geom_text(label = "NS", x = 0.7, y = 80) +
+  scale_fill_manual(values = ugr.colors) +
+  ylim(0, 80) +
+  labs(x = "Grazed", y = "Cool-Season Grass (%)", title = "Pre-Treatment") +
+  pref.theme; ugr.csg14.plt
 
-ugr.csg.plt <- ggplot(ugr.csg.pltdf, aes(Herbicide.Treatment, CSG, color = Herbicide.Treatment)) +
-  geom_errorbar(aes(ymin = CSG - se, ymax = CSG + se), width = 0.3, position = dodge) +
-  geom_point(position = 'identity', size = 2.5) +
-  geom_text(label = "A", x = 0.8, y = 44.5, color = "black") +
-  geom_text(label = "AB", x = 1.7, y = 29.5, color = "black") +
-  geom_text(label = "B", x = 2.8, y = 21.5, color = "black") +
-  labs(x = "Herbicide Treatment", y = "CSG % Cover") +
-  scale_y_continuous(limits = csg.lims) +
-  scale_color_manual(values = ugr.colors) +
-  pref.theme + theme(legend.position = "none"); ugr.csg.plt
+# Plot the post-treatment responses
+cgr.csg.plt <- ggplot(cgr, aes(x = Herbicide.Treatment, y = CSG, fill = Herbicide.Treatment)) +
+  geom_boxplot(outlier.shape = 21) +
+  scale_fill_manual(values = cgr.colors) +
+  geom_text(label = "a", x = 0.9, y = 21) +
+  geom_text(label = "ab", x = 1.8, y = 30) +
+  geom_text(label = "b", x = 2.9, y = 34) +
+  ylim(0, 55) +
+  labs(x = "Grazed", y = "Cool-Season Grass (%)", title = "Post-Treatment") +
+  pref.theme; cgr.csg.plt
 
-# Save it
-plot_grid(cgr.csg.plt, ugr.csg.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
-ggplot2::ggsave("./Figures/CSG.pdf", width = 6, height = 4, units = 'in', plot = last_plot())
+ugr.csg.plt <- ggplot(ugr, aes(x = Herbicide.Treatment, y = CSG, fill = Herbicide.Treatment)) +
+  geom_boxplot(outlier.shape = 21) +
+  scale_fill_manual(values = ugr.colors) +
+  geom_text(label = "a", x = 0.9, y = 63) +
+  geom_text(label = "ab", x = 1.8, y = 44) +
+  geom_text(label = "b", x = 2.9, y = 35) +
+  ylim(0, 80) +
+  labs(x = "Un-Grazed", y = "Cool-Season Grass (%)", title = "Post-Treatment") +
+  pref.theme; ugr.csg.plt
+
+# Save some relevant combinations of these
+plot_grid(cgr.csg14.plt, cgr.csg.plt, ugr.csg14.plt, ugr.csg.plt,
+          labels = c("I", "II", "III", "IV"), nrow = 2, ncol = 2)
+ggplot2::ggsave("./Figures/CSG.pdf", width = 8, height = 6, units = 'in', plot = last_plot())
+
+plot_grid(cgr.csg14.plt, cgr.csg.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Figures/CSG_GB.pdf", width = 8, height = 6, units = 'in', plot = last_plot())
+
+plot_grid(ugr.csg14.plt, ugr.csg.plt, labels = c("I", "II"), nrow = 1, ncol = 2)
+ggplot2::ggsave("./Figures/CSG_Hay.pdf", width = 8, height = 6, units = 'in', plot = last_plot())
 
 ##  -------------------------------------------------------------------------  ##
                           # WSG ####
 ##  -------------------------------------------------------------------------  ##
 # Get summary stats for plotting
-cgr.wsg.pltdf <- summarySE(data = cgr, measurevar = "WSG", groupvars = c("Year"))
+cgr.wsg.pltdf <- summarySE(data = cgr, measurevar = "WSG", groupvars = c("Year", "Herbicide.Treatment"))
 ugr.wsg.pltdf <- summarySE(data = ugr, measurevar = "WSG", groupvars = c("Year", "Herbicide.Treatment"))
-wsg.lims <- c(0, 45)
+
+# Pre-treatment stuff
+cgr.wsg14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = WSG, fill = Herbicide.Treatment)) +
+  geom_boxplot(outlier.shape = 21) +
+  geom_text(label = "NS", x = 0.7, y = 55) +
+  scale_fill_manual(values = cgr.colors) +
+  #ylim(0, 55) +
+  labs(x = "Un-Grazed", y = "Cool-Season Grass (%)", title = "Pre-Treatment") +
+  pref.theme; cgr.wsg14.plt
+
+ugr.wsg14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = WSG, fill = Herbicide.Treatment)) +
+  geom_boxplot(outlier.shape = 21) +
+  geom_text(label = "NS", x = 0.7, y = 80) +
+  scale_fill_manual(values = ugr.colors) +
+  #ylim(0, 80) +
+  labs(x = "Grazed", y = "Cool-Season Grass (%)", title = "Pre-Treatment") +
+  pref.theme; ugr.wsg14.plt
+
+
 
 # Plots
 cgr.wsg.plt <- ggplot(cgr.wsg.pltdf, aes(Year, WSG, color = rep.int("x", nrow(cgr.wsg.pltdf)))) +
