@@ -11,8 +11,6 @@
 
 # Required libraries
 library(RRPP) # Analysis
-library(ggplot2); library(cowplot) # Plotting
-library(Rmisc) # get summary values for plotting
 
 # Set working directory (Also, "Session" menu to "Set Working Directory" works)
 setwd("~/Documents/School/Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
