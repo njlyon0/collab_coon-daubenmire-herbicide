@@ -189,7 +189,7 @@ sort(unique(daub.v3$Seedmix.of.Total)) # should have only 0 or 1
 # Want to know how many quadrats have "heavy" fescue/CSG cover (i.e. > some threshold)
 
 # Set threshold
-thresh <- 50
+thresh <- 75
 
 # Get a new column for "heavy" cover quadrats
 daub.v3$Heavy.Fescue <- ifelse(daub.v3$Fescue > thresh, yes = 1, no = 0)
@@ -199,6 +199,11 @@ daub.v3$Heavy.WSG <- ifelse(daub.v3$WSG > thresh, yes = 1, no = 0)
 ##  ---------------------------------------------------------------------------------------------  ##
                         # Get Patch-Level Values ####
 ##  ---------------------------------------------------------------------------------------------  ##
+# Before getting the patch-level averages, check how many quadrats are in some relevant subsets of sites
+nrow(subset(daub.v3, (Pasture == "BSH" | Pasture == "DUN" | Pasture == "GIL" | 
+                        Pasture == "LTR" | Pasture == "PYW" | Pasture == "RC2" |
+                        Pasture == "STE")))
+
 # Get patch-level averages for all the response variables
 daub.v4 <- ddply(daub.v3, 
             c("Pasture_Patch_Year", "Patch", "Pasture", "Year",
@@ -269,4 +274,5 @@ write.csv(herb.comp, "./Data/sns-data_14-vs-18.csv", row.names = F)
 
 
 # END ####
+
 
