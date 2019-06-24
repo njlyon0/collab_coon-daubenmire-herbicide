@@ -226,12 +226,6 @@ simp.rrpp <- function (object, test.type = c("dist", "VC", "var"), angle.type = 
 }
 
 # General analytical procedure
-## 1) Fit model with interaction term and assess *ONLY* the interaction term
-## 2) If insignificant, run a new model without it (if significant, stop there, you're done)
-## 3) If either explanatory variable is significant, fit a separate model of just that one
-## 4) Run pairwise comparisons on that single-variable model
-
-# General analytical procedure
   ## 1) Fit model with interaction term and assess *ONLY* the interaction term
   ## 2) If insignificant, run a new model without it (if significant, stop there, you're done)
   ## 3) If either explanatory variable is significant, fit a separate model of just that one
@@ -247,7 +241,14 @@ anova(lm.rrpp(Hvy.CSG ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), ef
   ## NS
 
 anova(lm.rrpp(Hvy.CSG ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F")
-  ## interxn = sig!
+  ## interxn = NS
+anova(lm.rrpp(Hvy.CSG ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F")
+  ## trt = sig
+
+# Pairwise comparisons
+csg.trt.ugr.fit <- lm.rrpp(Hvy.CSG ~ Herbicide.Treatment, data = ugr, iter = 9999)
+csg.trt.ugr.pairs <- simp.rrpp(pairwise(csg.trt.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
+csg.trt.ugr.pairs
 
 ##  ---------------------------------------------------------------------------------------------  ##
                         # Warm Season Grasses ####
@@ -259,7 +260,9 @@ anova(lm.rrpp(Hvy.WSG ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), ef
   ## NS
 
 anova(lm.rrpp(Hvy.WSG ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F")
-  ## interxn = sig
+  ## interxn = NS
+anova(lm.rrpp(Hvy.WSG ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F")
+  ## NS
 
 ##  ---------------------------------------------------------------------------------------------  ##
                               # Heavy Fescue ####
