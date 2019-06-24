@@ -263,10 +263,17 @@ csg.trt.ugr.pairs
 anova(lm.rrpp(Hvy.WSG ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F")
   ## interxn = NS
 anova(lm.rrpp(Hvy.WSG ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F")
-  ## NS
+  ## year = marginal
 
 anova(lm.rrpp(Hvy.WSG ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F")
-  ## interxn = sig
+  ## interxn = NS
+anova(lm.rrpp(Hvy.WSG ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F")
+  ## treat = sig
+
+# Pairwise comparisons
+wsg.trt.ugr.fit <- lm.rrpp(Hvy.WSG ~ Herbicide.Treatment, data = ugr, iter = 9999)
+wsg.trt.ugr.pairs <- simp.rrpp(pairwise(wsg.trt.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
+wsg.trt.ugr.pairs
 
 ##  ---------------------------------------------------------------------------------------------  ##
                               # Heavy Fescue ####
@@ -277,15 +284,15 @@ anova(lm.rrpp(Hvy.Fesc ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), e
 anova(lm.rrpp(Hvy.Fesc ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F")
   ## both sig
 
+fsc.trt.cgr.fit <- lm.rrpp(Hvy.Fesc ~ Herbicide.Treatment, data = cgr, iter = 9999)
+fsc.trt.cgr.pairs <- simp.rrpp(pairwise(fsc.trt.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+fsc.trt.cgr.pairs
+
 # Un-grazed
 anova(lm.rrpp(Hvy.Fesc ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F")
   ## interxn = NS
 anova(lm.rrpp(Hvy.Fesc ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F")
-  ## both sig
-
-fsc.trt.cgr.fit <- lm.rrpp(Hvy.Fesc ~ Herbicide.Treatment, data = cgr, iter = 9999)
-fsc.trt.cgr.pairs <- simp.rrpp(pairwise(fsc.trt.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
-fsc.trt.cgr.pairs
+  ## treat = sig
 
 fsc.trt.ugr.fit <- lm.rrpp(Hvy.Fesc ~ Herbicide.Treatment, data = ugr, iter = 9999)
 fsc.trt.ugr.pairs <- simp.rrpp(pairwise(fsc.trt.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
