@@ -232,7 +232,7 @@ nrow(daub.v3); nrow(daub.v4)
 write.csv(daub.v4, "./Data/daub-data_clean.csv", row.names = F)
 
 ##  ---------------------------------------------------------------------------------------------  ##
-                     # Get Project-Specific Dataframe ####
+                     # Get Project-Specific Dataframes ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Get just the spray and seeded data (but remove RCH too)
 herb <- subset(daub.v4, (daub.v4$Herbicide.Treatment == "Con" | 
@@ -271,6 +271,49 @@ write.csv(herb.pst.trt, "./Data/sns-data_post-trt.csv", row.names = F)
   ## 3. 2014 and 2018 only (was there a difference between before and the very end?)
 herb.comp <- subset(herb.v2, Year == "14" | Year == "18")
 write.csv(herb.comp, "./Data/sns-data_14-vs-18.csv", row.names = F)
+
+##  ---------------------------------------------------------------------------------------------  ##
+                           # Get Summarized Dataframes for Plotting ####
+##  ---------------------------------------------------------------------------------------------  ##
+# Check the structure of the 2014 data
+str(herb.14)
+
+# Get treatment-level averages for *all* variables (and standard errors too)
+herb.14.sumzd <- ddply(herb.14, c("Year", "Treatment", "Herbicide.Treatment"), summarise,
+                       Avg.CSG = mean(CSG),
+                       SE.CSG = (sd(CSG)/nrow(herb.14)), 
+                       Avg.WSG = mean(WSG),
+                       SE.WSG = (sd(WSG)/nrow(herb.14)), 
+                       Avg.Fescue = mean(Fescue),
+                       SE.Fescue = (sd(Fescue)/nrow(herb.14)), 
+                       Avg.Forbs = mean(Forbs),
+                       SE.Forbs = (sd(Forbs)/nrow(herb.14)), 
+                       Avg.Legumes = mean(Legumes),
+                       SE.Legumes = (sd(Legumes)/nrow(herb.14)), 
+                       Avg.Woody = mean(Woody),
+                       SE.Woody = (sd(Woody)/nrow(herb.14)), 
+                       Avg.Bare = mean(Bare),
+                       SE.Bare = (sd(Bare)/nrow(herb.14)), 
+                       Avg.Litter = mean(Litter),
+                       SE.Litter = (sd(Litter)/nrow(herb.14)), 
+                       Avg.Seedmix = mean(Seedmix),
+                       SE.Seedmix = (sd(Seedmix)/nrow(herb.14)), 
+                       Avg.Robel = mean(Robel),
+                       SE.Robel = (sd(Robel)/nrow(herb.14)), 
+                       Avg.Panic = mean(Panic),
+                       SE.Panic = (sd(Panic)/nrow(herb.14)), 
+                       Avg.LitDep = mean(LitDep),
+                       SE.LitDep = (sd(LitDep)/nrow(herb.14)), 
+                       Avg.Hvy.Fesc = mean(Hvy.Fesc),
+                       SE.Hvy.Fesc = (sd(Hvy.Fesc)/nrow(herb.14)), 
+                       Avg.Hvy.CSG = mean(Hvy.CSG),
+                       SE.Hvy.CSG = (sd(Hvy.CSG)/nrow(herb.14)), 
+                       Avg.Hvy.WSG = mean(Hvy.WSG),
+                       SE.Hvy.WSG = (sd(Hvy.WSG)/nrow(herb.14)) )
+
+# Save the new dataframe for use in figure creation!
+write.csv(herb.14.sumzd, "./Data/sns-data_2014_summarized.csv", row.names = F)
+
 
 
 # END ####
