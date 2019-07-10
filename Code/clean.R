@@ -6,7 +6,7 @@
 # START ####
 
 # Required libraries
-library(plyr); library(stringr)
+library(plyr); library(stringr); library(gmodels)
 
 # Set working directory (Also, "Session" menu to "Set Working Directory" works)
 setwd("~/Documents/School/Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
@@ -282,34 +282,49 @@ str(herb.14)
 herb.14.sumzd <- ddply(herb.14, c("Year", "Treatment", "Herbicide.Treatment"), summarise,
                        Avg.CSG = mean(CSG),
                        SE.CSG = (sd(CSG)/nrow(herb.14)), 
+                       CI.CSG = abs(ci(CSG)[1] - abs(ci(CSG)[2])),
                        Avg.WSG = mean(WSG),
                        SE.WSG = (sd(WSG)/nrow(herb.14)), 
+                       CI.WSG = abs(ci(WSG)[1] - abs(ci(WSG)[2])),
                        Avg.Fescue = mean(Fescue),
                        SE.Fescue = (sd(Fescue)/nrow(herb.14)), 
+                       CI.Fescue = abs(ci(Fescue)[1] - abs(ci(Fescue)[2])),
                        Avg.Forbs = mean(Forbs),
                        SE.Forbs = (sd(Forbs)/nrow(herb.14)), 
+                       CI.Forbs = abs(ci(Forbs)[1] - abs(ci(Forbs)[2])),
                        Avg.Legumes = mean(Legumes),
                        SE.Legumes = (sd(Legumes)/nrow(herb.14)), 
+                       CI.Legumes = abs(ci(Legumes)[1] - abs(ci(Legumes)[2])),
                        Avg.Woody = mean(Woody),
                        SE.Woody = (sd(Woody)/nrow(herb.14)), 
+                       CI.Woody = abs(ci(Woody)[1] - abs(ci(Woody)[2])),
                        Avg.Bare = mean(Bare),
                        SE.Bare = (sd(Bare)/nrow(herb.14)), 
+                       CI.Bare = abs(ci(Bare)[1] - abs(ci(Bare)[2])),
                        Avg.Litter = mean(Litter),
                        SE.Litter = (sd(Litter)/nrow(herb.14)), 
+                       CI.Litter = abs(ci(Litter)[1] - abs(ci(Litter)[2])),
                        Avg.Seedmix = mean(Seedmix),
                        SE.Seedmix = (sd(Seedmix)/nrow(herb.14)), 
+                       CI.Seedmix = abs(ci(Seedmix)[1] - abs(ci(Seedmix)[2])),
                        Avg.Robel = mean(Robel),
                        SE.Robel = (sd(Robel)/nrow(herb.14)), 
+                       CI.Robel = abs(ci(Robel)[1] - abs(ci(Robel)[2])),
                        Avg.Panic = mean(Panic),
                        SE.Panic = (sd(Panic)/nrow(herb.14)), 
+                       CI.Panic = abs(ci(Panic)[1] - abs(ci(Panic)[2])),
                        Avg.LitDep = mean(LitDep),
                        SE.LitDep = (sd(LitDep)/nrow(herb.14)), 
+                       CI.LitDep = abs(ci(LitDep)[1] - abs(ci(LitDep)[2])),
                        Avg.Hvy.Fesc = mean(Hvy.Fesc),
                        SE.Hvy.Fesc = (sd(Hvy.Fesc)/nrow(herb.14)), 
+                       CI.Hvy.Fesc = abs(ci(Hvy.Fesc)[1] - abs(ci(Hvy.Fesc)[2])),
                        Avg.Hvy.CSG = mean(Hvy.CSG),
                        SE.Hvy.CSG = (sd(Hvy.CSG)/nrow(herb.14)), 
+                       CI.Hvy.CSG = abs(ci(Hvy.CSG)[1] - abs(ci(Hvy.CSG)[2])),
                        Avg.Hvy.WSG = mean(Hvy.WSG),
-                       SE.Hvy.WSG = (sd(Hvy.WSG)/nrow(herb.14)) )
+                       SE.Hvy.WSG = (sd(Hvy.WSG)/nrow(herb.14)),
+                       CI.Hvy.WSG = abs(ci(Hvy.WSG)[1] - abs(ci(Hvy.WSG)[2])) )
 
 # Save the new dataframe for use in figure creation!
 write.csv(herb.14.sumzd, "./Data/sns-data_2014_summarized.csv", row.names = F)
