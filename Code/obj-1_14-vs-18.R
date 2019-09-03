@@ -284,7 +284,8 @@ anova(lm.rrpp(Seedmix ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), ef
 ##  ---------------------------------------------------------------------------------------------  ##
                                 # Forbs ####
 ##  ---------------------------------------------------------------------------------------------  ##
-anova(lm.rrpp(Forbs ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # int = marginal
+anova(lm.rrpp(Forbs ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # int = NS
+anova(lm.rrpp(Forbs ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # yr = sig
 
 anova(lm.rrpp(Forbs ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # interxn = NS
 anova(lm.rrpp(Forbs ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
