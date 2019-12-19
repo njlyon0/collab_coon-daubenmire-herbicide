@@ -235,26 +235,54 @@ simp.rrpp <- function (object, test.type = c("dist", "VC", "var"), angle.type = 
 ##  ---------------------------------------------------------------------------------------------  ##
                                 # Bare Cover ####
 ##  ---------------------------------------------------------------------------------------------  ##
+# Analysis
 anova(lm.rrpp(Bare ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Bare ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairwise 
+bar.14.cgr.fit <- lm.rrpp(Bare ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(bar.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+bar.14.ugr.fit <- lm.rrpp(Bare ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(bar.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 ##  ---------------------------------------------------------------------------------------------  ##
                               # Litter Cover ####
 ##  ---------------------------------------------------------------------------------------------  ##
+# Analysis
 anova(lm.rrpp(Litter ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Litter ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairwise 
+ltr.14.cgr.fit <- lm.rrpp(Litter ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(ltr.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+ltr.14.ugr.fit <- lm.rrpp(Litter ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(ltr.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 ##  ---------------------------------------------------------------------------------------------  ##
                               # Robel (dm) ####
 ##  ---------------------------------------------------------------------------------------------  ##
+# Analysis
 anova(lm.rrpp(Robel ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Robel ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairwise
+rbl.14.cgr.fit <- lm.rrpp(Robel ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(rbl.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+rbl.14.ugr.fit <- lm.rrpp(Robel ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(rbl.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 ##  ---------------------------------------------------------------------------------------------  ##
                           # Litter Depth (cm) ####
 ##  ---------------------------------------------------------------------------------------------  ##
+# Analysis
 anova(lm.rrpp(LitDep ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(LitDep ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairwise
+ldp.14.cgr.fit <- lm.rrpp(LitDep ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(ldp.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+ldp.14.ugr.fit <- lm.rrpp(LitDep ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(ldp.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 # END ####
 

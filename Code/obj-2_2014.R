@@ -239,12 +239,24 @@ simp.rrpp <- function (object, test.type = c("dist", "VC", "var"), angle.type = 
 anova(lm.rrpp(Hvy.CSG ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Hvy.CSG ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
 
+# Pairwise
+csg.14.cgr.fit <- lm.rrpp(Hvy.CSG ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(csg.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+csg.14.ugr.fit <- lm.rrpp(Hvy.CSG ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(csg.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
+
 ##  ---------------------------------------------------------------------------------------------  ##
-                        # Warm Season Grasses ####
+                         # Heavy WSG Quadrats ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
 anova(lm.rrpp(Hvy.WSG ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Hvy.WSG ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairwise
+wsg.14.cgr.fit <- lm.rrpp(Hvy.WSG ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(wsg.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+wsg.14.ugr.fit <- lm.rrpp(Hvy.WSG ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(wsg.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 ##  ---------------------------------------------------------------------------------------------  ##
                               # Heavy Fescue ####
@@ -252,5 +264,11 @@ anova(lm.rrpp(Hvy.WSG ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.ty
 # Analysis
 anova(lm.rrpp(Hvy.Fesc ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Hvy.Fesc ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairwise
+fsc.14.cgr.fit <- lm.rrpp(Hvy.Fesc ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(fsc.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+fsc.14.ugr.fit <- lm.rrpp(Hvy.Fesc ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(fsc.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 # END ####

@@ -239,12 +239,24 @@ simp.rrpp <- function (object, test.type = c("dist", "VC", "var"), angle.type = 
 anova(lm.rrpp(CSG ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(CSG ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
 
+# Pairwise
+csg.14.cgr.fit <- lm.rrpp(CSG ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(csg.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+csg.14.ugr.fit <- lm.rrpp(CSG ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(csg.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
+
 ##  ---------------------------------------------------------------------------------------------  ##
                         # Warm Season Grasses ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
 anova(lm.rrpp(WSG ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(WSG ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairwise
+wsg.14.cgr.fit <- lm.rrpp(WSG ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(wsg.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+wsg.14.ugr.fit <- lm.rrpp(WSG ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(wsg.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 ##  ---------------------------------------------------------------------------------------------  ##
                                 # Fescue ####
@@ -253,12 +265,24 @@ anova(lm.rrpp(WSG ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type =
 anova(lm.rrpp(Fescue ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Fescue ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
 
+# Pairwise
+fsc.14.cgr.fit <- lm.rrpp(Fescue ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(fsc.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+fsc.14.ugr.fit <- lm.rrpp(Fescue ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(fsc.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
+
 ##  ---------------------------------------------------------------------------------------------  ##
                         # Seedmix Threshhold ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
 anova(lm.rrpp(Seedmix ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Seedmix ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairwise
+smx.14.cgr.fit <- lm.rrpp(Seedmix ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(smx.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+smx.14.ugr.fit <- lm.rrpp(Seedmix ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(smx.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 ##  ---------------------------------------------------------------------------------------------  ##
                                 # Forbs ####
@@ -267,12 +291,24 @@ anova(lm.rrpp(Seedmix ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.ty
 anova(lm.rrpp(Forbs ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Forbs ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
 
+# Pairwise
+frb.14.cgr.fit <- lm.rrpp(Forbs ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(frb.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+frb.14.ugr.fit <- lm.rrpp(Forbs ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(frb.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
+
 ##  ---------------------------------------------------------------------------------------------  ##
                               # Legumes ####
 ##  ---------------------------------------------------------------------------------------------  ##
 # Analysis
 anova(lm.rrpp(Legumes ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Legumes ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairwise
+lgm.14.cgr.fit <- lm.rrpp(Legumes ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(lgm.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+lgm.14.ugr.fit <- lm.rrpp(Legumes ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(lgm.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 ##  ---------------------------------------------------------------------------------------------  ##
                                 # Woody ####
@@ -281,11 +317,23 @@ anova(lm.rrpp(Legumes ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.ty
 anova(lm.rrpp(Woody ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Woody ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
 
+# Pairwise
+wdy.14.cgr.fit <- lm.rrpp(Woody ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(wdy.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+wdy.14.ugr.fit <- lm.rrpp(Woody ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(wdy.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
+
 ##  -----------------------------------------  ##
              # Panic ####
 ##  -----------------------------------------  ##
 anova(lm.rrpp(Panic ~ Herbicide.Treatment, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Panic ~ Herbicide.Treatment, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairwise
+pnc.14.cgr.fit <- lm.rrpp(Panic ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(pnc.14.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+pnc.14.ugr.fit <- lm.rrpp(Panic ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(pnc.14.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 # END ####
 
