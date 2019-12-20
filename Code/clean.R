@@ -6,7 +6,7 @@
 # START ####
 
 # Required libraries
-library(plyr); library(stringr); library(gmodels)
+library(plyr); library(stringr); library(gmodels); library(plotrix)
 
 # Set working directory (Also, "Session" menu to "Set Working Directory" works)
 setwd("~/Documents/School/Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
@@ -281,49 +281,49 @@ str(herb.14)
 # Get treatment-level averages for *all* variables (and standard errors too)
 herb.14.sumzd <- ddply(herb.14, c("Year", "Treatment", "Herbicide.Treatment"), summarise,
                        Avg.CSG = mean(CSG),
-                       SE.CSG = (sd(CSG)/nrow(herb.14)), 
+                       SE.CSG = std.error(CSG), 
                        CI.CSG = abs(ci(CSG)[1] - abs(ci(CSG)[2])),
                        Avg.WSG = mean(WSG),
-                       SE.WSG = (sd(WSG)/nrow(herb.14)), 
+                       SE.WSG = std.error(WSG), 
                        CI.WSG = abs(ci(WSG)[1] - abs(ci(WSG)[2])),
                        Avg.Fescue = mean(Fescue),
-                       SE.Fescue = (sd(Fescue)/nrow(herb.14)), 
+                       SE.Fescue = std.error(Fescue), 
                        CI.Fescue = abs(ci(Fescue)[1] - abs(ci(Fescue)[2])),
                        Avg.Forbs = mean(Forbs),
-                       SE.Forbs = (sd(Forbs)/nrow(herb.14)), 
+                       SE.Forbs = std.error(Forbs), 
                        CI.Forbs = abs(ci(Forbs)[1] - abs(ci(Forbs)[2])),
                        Avg.Legumes = mean(Legumes),
-                       SE.Legumes = (sd(Legumes)/nrow(herb.14)), 
+                       SE.Legumes = std.error(Legumes), 
                        CI.Legumes = abs(ci(Legumes)[1] - abs(ci(Legumes)[2])),
                        Avg.Woody = mean(Woody),
-                       SE.Woody = (sd(Woody)/nrow(herb.14)), 
+                       SE.Woody = std.error(Woody), 
                        CI.Woody = abs(ci(Woody)[1] - abs(ci(Woody)[2])),
                        Avg.Bare = mean(Bare),
-                       SE.Bare = (sd(Bare)/nrow(herb.14)), 
+                       SE.Bare = std.error(Bare), 
                        CI.Bare = abs(ci(Bare)[1] - abs(ci(Bare)[2])),
                        Avg.Litter = mean(Litter),
-                       SE.Litter = (sd(Litter)/nrow(herb.14)), 
+                       SE.Litter = std.error(Litter), 
                        CI.Litter = abs(ci(Litter)[1] - abs(ci(Litter)[2])),
                        Avg.Seedmix = mean(Seedmix),
-                       SE.Seedmix = (sd(Seedmix)/nrow(herb.14)), 
+                       SE.Seedmix = std.error(Seedmix), 
                        CI.Seedmix = abs(ci(Seedmix)[1] - abs(ci(Seedmix)[2])),
                        Avg.Robel = mean(Robel),
-                       SE.Robel = (sd(Robel)/nrow(herb.14)), 
+                       SE.Robel = std.error(Robel), 
                        CI.Robel = abs(ci(Robel)[1] - abs(ci(Robel)[2])),
                        Avg.Panic = mean(Panic),
-                       SE.Panic = (sd(Panic)/nrow(herb.14)), 
+                       SE.Panic = std.error(Panic), 
                        CI.Panic = abs(ci(Panic)[1] - abs(ci(Panic)[2])),
                        Avg.LitDep = mean(LitDep),
-                       SE.LitDep = (sd(LitDep)/nrow(herb.14)), 
+                       SE.LitDep = std.error(LitDep), 
                        CI.LitDep = abs(ci(LitDep)[1] - abs(ci(LitDep)[2])),
                        Avg.Hvy.Fesc = mean(Hvy.Fesc),
-                       SE.Hvy.Fesc = (sd(Hvy.Fesc)/nrow(herb.14)), 
+                       SE.Hvy.Fesc = std.error(Hvy.Fesc), 
                        CI.Hvy.Fesc = abs(ci(Hvy.Fesc)[1] - abs(ci(Hvy.Fesc)[2])),
                        Avg.Hvy.CSG = mean(Hvy.CSG),
-                       SE.Hvy.CSG = (sd(Hvy.CSG)/nrow(herb.14)), 
+                       SE.Hvy.CSG = std.error(Hvy.CSG), 
                        CI.Hvy.CSG = abs(ci(Hvy.CSG)[1] - abs(ci(Hvy.CSG)[2])),
                        Avg.Hvy.WSG = mean(Hvy.WSG),
-                       SE.Hvy.WSG = (sd(Hvy.WSG)/nrow(herb.14)),
+                       SE.Hvy.WSG = std.error(Hvy.WSG),
                        CI.Hvy.WSG = abs(ci(Hvy.WSG)[1] - abs(ci(Hvy.WSG)[2])) )
 
 # Save the new dataframe for use in figure creation!
