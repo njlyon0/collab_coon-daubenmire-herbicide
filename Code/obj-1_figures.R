@@ -261,7 +261,7 @@ cgr.smx14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Seedmix)) +
   #geom_text(label = "NS", x = 0.7, y = 0.13) + 
   scale_color_manual(values = cgr.colors) +
   scale_fill_manual(values = cgr.colors) +
-  ylim(-0.02, 0.2) +
+  ylim(0, 0.2) +
   labs(x = "Pre-Treatment", y = "Seedmix (Proportion >25%)") +
   pref.theme; cgr.smx14.plt
 
@@ -272,7 +272,7 @@ ugr.smx14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Seedmix)) +
   #geom_text(label = "NS", x = 0.7, y = 0.18) + 
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
-  ylim(-0.01, 0.18) +
+  ylim(0, 0.18) +
   labs(x = "Pre-Treatment", y = "Seedmix (Proportion >25%)") +
   pref.theme; ugr.smx14.plt
 
@@ -287,7 +287,7 @@ cgr.smx.plt <- ggplot(cgr.smx.pltdf, aes(x = Year, y = Seedmix)) +
   scale_color_manual(values = cgr.colors) +
   scale_fill_manual(values = cgr.colors) +
   scale_shape_manual(values = 21:23) +
-  ylim(-0.02, 0.2) +
+  ylim(0, 0.2) +
   labs(x = "Post-Treatment") +
   pref.theme + theme(legend.position = c(0.2, 0.9)) + no.y.axis; cgr.smx.plt
 
@@ -300,7 +300,7 @@ ugr.smx.plt <- ggplot(ugr.smx.pltdf, aes(x = Year, y = Seedmix, shape = Herbicid
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
   scale_shape_manual(values = 21:23) +
-  ylim(-0.01, 0.18) +
+  ylim(0, 0.18) +
   labs(x = "Post-Treatment") +
   pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; ugr.smx.plt
 
@@ -466,7 +466,7 @@ cgr.wdy14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Woody)) +
   #geom_text(label = "NS", x = 0.7, y = 7) + 
   scale_color_manual(values = cgr.colors) +
   scale_fill_manual(values = cgr.colors) +
-  ylim(-0.01, 7) +
+  ylim(0, 7) +
   labs(x = "Pre-Treatment", y = "Woody (%)") +
   pref.theme; cgr.wdy14.plt
 
@@ -477,7 +477,7 @@ ugr.wdy14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Woody)) +
   #geom_text(label = "NS", x = 0.7, y = 7) + 
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
-  ylim(-0.5, 7) +
+  ylim(0, 7) +
   labs(x = "Pre-Treatment", y = "Woody (%)") +
   pref.theme; ugr.wdy14.plt
 
@@ -501,7 +501,7 @@ ugr.wdy.plt <- ggplot(ugr.wdy.pltdf, aes(x = Year, y = Woody, shape = Herbicide.
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
   scale_shape_manual(values = 21:23) +
-  ylim(-0.5, 7) +
+  ylim(0, 7) +
   labs(x = "Post-Treatment") +
   pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; ugr.wdy.plt
 
@@ -531,7 +531,7 @@ cgr.pnc14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Panic)) +
   #geom_text(label = "NS", x = 0.7, y = 0.85) + 
   scale_color_manual(values = cgr.colors) +
   scale_fill_manual(values = cgr.colors) +
-  ylim(-0.01, 1) +
+  ylim(0, 1) +
   labs(x = "Pre-Treatment", y = "Panic (Proportion Present)") +
   pref.theme; cgr.pnc14.plt
 
@@ -542,7 +542,7 @@ ugr.pnc14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Panic)) +
   #geom_text(label = "NS", x = 0.7, y = 0.85) + 
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
-  ylim(-0.31, 1) +
+  ylim(0, 1) +
   labs(x = "Pre-Treatment", y = "Panic (Proportion Present)") +
   pref.theme; ugr.pnc14.plt
 
@@ -555,7 +555,7 @@ cgr.pnc.plt <- ggplot(cgr.pnc.pltdf, aes(x = Year, y = Panic, color = rep("x", 4
   scale_color_manual(values = "black") +
   scale_fill_manual(values = "gray") +
   scale_shape_manual(values = 24) +
-  ylim(-0.01, 1) +
+  ylim(0, 1) +
   labs(x = "Post-Treatment") +
   pref.theme + no.y.axis; cgr.pnc.plt
 
@@ -565,7 +565,7 @@ ugr.pnc.plt <- ggplot(ugr, aes(x = Herbicide.Treatment, y = Panic, fill = Herbic
   geom_text(label = "a", x = 0.8, y = 0.1, color = "black") +
   geom_text(label = "ab", x = 1.7, y = 0.35, color = "black") +
   geom_text(label = "b", x = 2.8, y = 0.33, color = "black") +
-  ylim(-0.31, 1) +
+  ylim(0, 1) +
   labs(x = "Post-Treatment") +
   pref.theme + no.y.axis; ugr.pnc.plt 
 
