@@ -269,6 +269,11 @@ anova(lm.rrpp(WSG ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect
 anova(lm.rrpp(WSG ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F")
   ## NS
 
+# Pairwise comparison
+wsg.cgr.fit <- lm.rrpp(WSG ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(wsg.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+
+# Analysis
 anova(lm.rrpp(WSG ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F")
   ## interxn = sig
 
@@ -304,8 +309,17 @@ fsc.trt.ugr.pairs
 anova(lm.rrpp(Seedmix ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # interxn = NS
 anova(lm.rrpp(Seedmix ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # NS
 
+# Pairwise comparison
+smx.cgr.fit <- lm.rrpp(Seedmix ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(smx.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+
+# Analysis
 anova(lm.rrpp(Seedmix ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # interxn = NS
 anova(lm.rrpp(Seedmix ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairwise comparison
+smx.ugr.fit <- lm.rrpp(Seedmix ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(smx.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 ##  ---------------------------------------------------------------------------------------------  ##
                                 # Forbs ####
@@ -333,6 +347,11 @@ frb.trt.ugr.pairs
 anova(lm.rrpp(Legumes ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # interxn = NS
 anova(lm.rrpp(Legumes ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # NS
 
+# Pairwise comparison
+lgm.cgr.fit <- lm.rrpp(Legumes ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(lgm.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+
+# Analysis
 anova(lm.rrpp(Legumes ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # interxn = sig
 
 ##  ---------------------------------------------------------------------------------------------  ##
@@ -345,10 +364,14 @@ anova(lm.rrpp(Woody ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effe
 anova(lm.rrpp(Woody ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # interxn = NS
 anova(lm.rrpp(Woody ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
 
+# Pairwise comparison for CGR
 wdy.trt.cgr.fit <- lm.rrpp(Woody ~ Herbicide.Treatment, data = cgr, iter = 9999)
-wdy.trt.cgr.pairs <- simp.rrpp(pairwise(wdy.trt.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
-wdy.trt.cgr.pairs
+simp.rrpp(pairwise(wdy.trt.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
   ## Con = A | Spr = AB | SnS = B
+
+# Pairwise comparison for UGR
+wdy.ugr.fit <- lm.rrpp(Woody ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(wdy.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 ##  -----------------------------------------  ##
              # Panic ####
@@ -359,9 +382,12 @@ anova(lm.rrpp(Panic ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effe
 anova(lm.rrpp(Panic ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # interxn = NS
 anova(lm.rrpp(Panic ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # trt = sig
 
-pnc.trt.ugr.fit <- lm.rrpp(Woody ~ Herbicide.Treatment, data = ugr, iter = 9999)
-pnc.trt.ugr.pairs <- simp.rrpp(pairwise(pnc.trt.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
-pnc.trt.ugr.pairs
+# Pairwise comparisons
+pnc.trt.cgr.fit <- lm.rrpp(Panic ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(pnc.trt.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+
+pnc.trt.ugr.fit <- lm.rrpp(Panic ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(pnc.trt.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 # END ####
 

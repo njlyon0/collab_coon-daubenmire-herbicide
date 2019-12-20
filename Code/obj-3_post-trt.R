@@ -230,38 +230,78 @@ simp.rrpp <- function (object, test.type = c("dist", "VC", "var"), angle.type = 
 ##  ---------------------------------------------------------------------------------------------  ##
                                 # Bare Cover ####
 ##  ---------------------------------------------------------------------------------------------  ##
+# Analysis (CGR)
 anova(lm.rrpp(Bare ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # interxn = NS
 anova(lm.rrpp(Bare ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # NS
 
+# Pairs
+bar.trt.cgr.fit <- lm.rrpp(Bare ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(bar.trt.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+
+# Analysis (UGR)
 anova(lm.rrpp(Bare ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Bare ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairs
+bar.trt.ugr.fit <- lm.rrpp(Bare ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(bar.trt.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 ##  ---------------------------------------------------------------------------------------------  ##
                               # Litter Cover ####
 ##  ---------------------------------------------------------------------------------------------  ##
+# Analysis
 anova(lm.rrpp(Litter ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # interxn = NS
 anova(lm.rrpp(Litter ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # yr = sig
 
+# Pairs
+ltr.trt.cgr.fit <- lm.rrpp(Litter ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(ltr.trt.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+
+# Analysis
 anova(lm.rrpp(Litter ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Litter ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairs
+ltr.trt.ugr.fit <- lm.rrpp(Litter ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(ltr.trt.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 ##  ---------------------------------------------------------------------------------------------  ##
                               # Robel (dm) ####
 ##  ---------------------------------------------------------------------------------------------  ##
+# Analysis
 anova(lm.rrpp(Robel ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Robel ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # NS
 
+# Pairs
+rbl.trt.cgr.fit <- lm.rrpp(Robel ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(rbl.trt.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+
+# Analysis
 anova(lm.rrpp(Robel ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(Robel ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairs
+rbl.trt.ugr.fit <- lm.rrpp(Robel ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(rbl.trt.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 ##  ---------------------------------------------------------------------------------------------  ##
                           # Litter Depth (cm) ####
 ##  ---------------------------------------------------------------------------------------------  ##
+# Analysis
 anova(lm.rrpp(LitDep ~ Herbicide.Treatment * Year, data = cgr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(LitDep ~ Herbicide.Treatment + Year, data = cgr, iter = 9999), effect.type = "F") # NS
 
+# Pairs
+ldp.trt.cgr.fit <- lm.rrpp(LitDep ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(ldp.trt.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+
+# Analysis
 anova(lm.rrpp(LitDep ~ Herbicide.Treatment * Year, data = ugr, iter = 9999), effect.type = "F") # NS
 anova(lm.rrpp(LitDep ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), effect.type = "F") # NS
+
+# Pairs
+ldp.trt.ugr.fit <- lm.rrpp(LitDep ~ Herbicide.Treatment, data = ugr, iter = 9999)
+simp.rrpp(pairwise(ldp.trt.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 # END ####
 

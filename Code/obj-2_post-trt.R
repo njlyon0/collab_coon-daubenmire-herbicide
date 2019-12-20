@@ -247,13 +247,14 @@ anova(lm.rrpp(Hvy.CSG ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), ef
   ## treat = sig
 
 # Fit models
+csg.trt.cgr.fit <- lm.rrpp(Hvy.CSG ~ Herbicide.Treatment, data = cgr, iter = 9999)
 csg.trt.ugr.fit <- lm.rrpp(Hvy.CSG ~ Herbicide.Treatment, data = ugr, iter = 9999)
 
-# Get pairwise comps
-csg.trt.ugr.pairs <- simp.rrpp(pairwise(csg.trt.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
+# Pairwise for CGR
+simp.rrpp(pairwise(csg.trt.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
 
-# Report
-csg.trt.ugr.pairs
+# Get pairwise comps (UGR)
+simp.rrpp(pairwise(csg.trt.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
   ## Con = A | Spr = AB | SnS = B
 
 ##  ---------------------------------------------------------------------------------------------  ##
@@ -271,9 +272,11 @@ anova(lm.rrpp(Hvy.WSG ~ Herbicide.Treatment + Year, data = ugr, iter = 9999), ef
   ## treat = sig
 
 # Pairwise comparisons
+wsg.trt.cgr.fit <- lm.rrpp(Hvy.WSG ~ Herbicide.Treatment, data = cgr, iter = 9999)
+simp.rrpp(pairwise(wsg.trt.cgr.fit, fit.null = NULL, groups = cgr$Herbicide.Treatment))
+
 wsg.trt.ugr.fit <- lm.rrpp(Hvy.WSG ~ Herbicide.Treatment, data = ugr, iter = 9999)
-wsg.trt.ugr.pairs <- simp.rrpp(pairwise(wsg.trt.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
-wsg.trt.ugr.pairs
+simp.rrpp(pairwise(wsg.trt.ugr.fit, fit.null = NULL, groups = ugr$Herbicide.Treatment))
 
 ##  ---------------------------------------------------------------------------------------------  ##
                               # Heavy Fescue ####
