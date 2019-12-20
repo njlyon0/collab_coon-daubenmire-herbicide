@@ -44,8 +44,9 @@ cgr.colors <- c("Con" = "#d73027", "Spr" = "#f46d43", "SnS" = "#fdae61") # shade
 ugr.colors <- c("Con" = "#4575b4", "Spr" = "#74add1", "SnS" = "#abd9e9") # shades of blue
 dodge <- position_dodge(width = 0.5)
 pref.theme <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                    panel.background = element_blank(), axis.line = element_line(colour = "white"), 
-                    legend.title = element_blank(), legend.position = "none")
+                    panel.background = element_blank(), axis.line = element_line(colour = "black"), 
+                    legend.title = element_blank(), legend.position = "none",
+                    axis.text = element_text(size = 14), axis.title = element_text(size = 16))
 no.y.axis <- theme(axis.title.y = element_blank(), axis.text.y = element_blank(),
                    axis.ticks.y = element_blank(), axis.line.y = element_blank())
 
@@ -57,7 +58,7 @@ cgr.csg.pltdf <- summarySE(data = cgr, measurevar = "Hvy.CSG", groupvars = c("Ye
 
 # Pre-treatment graphs
 cgr.csg14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Hvy.CSG)) +
-  geom_errorbar(aes(ymax = Avg.Hvy.CSG + CI.Hvy.CSG, ymin = Avg.Hvy.CSG - CI.Hvy.CSG, color = Herbicide.Treatment),
+  geom_errorbar(aes(ymax = Avg.Hvy.CSG + SE.Hvy.CSG, ymin = Avg.Hvy.CSG - SE.Hvy.CSG, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5, shape = 21:23) +
   #geom_text(label = "NS", x = 0.7, y = 55) + 
@@ -68,13 +69,13 @@ cgr.csg14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Hvy.CSG)) +
   pref.theme; cgr.csg14.plt
 
 ugr.csg14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Hvy.CSG)) +
-  geom_errorbar(aes(ymax = Avg.Hvy.CSG + CI.Hvy.CSG, ymin = Avg.Hvy.CSG - CI.Hvy.CSG, color = Herbicide.Treatment),
+  geom_errorbar(aes(ymax = Avg.Hvy.CSG + SE.Hvy.CSG, ymin = Avg.Hvy.CSG - SE.Hvy.CSG, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5, shape = 21:23) +
   #geom_text(label = "NS", x = 0.7, y = 80) + 
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
-  ylim(-3, 25) +
+  ylim(0, 25) +
   labs(x = "Pre-Treatment", y = "Heavy CSG Quadrats (#)") +
   pref.theme; ugr.csg14.plt
 
@@ -98,7 +99,7 @@ ugr.csg.plt <- ggplot(ugr, aes(x = Herbicide.Treatment, y = Hvy.CSG, fill = Herb
   geom_text(label = "a", x = 0.9, y = 11.5) +
   geom_text(label = "ab", x = 1.8, y = 5) +
   geom_text(label = "b", x = 2.9, y = 2) +
-  ylim(-3, 25) +
+  ylim(0, 25) +
   labs(x = "Post-Treatment") +
   pref.theme + no.y.axis; ugr.csg.plt
 
@@ -121,7 +122,7 @@ cgr.wsg.pltdf <- summarySE(data = cgr, measurevar = "Hvy.WSG", groupvars = c("Ye
 
 # Pre-treatment graphss
 cgr.wsg14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Hvy.WSG)) +
-  geom_errorbar(aes(ymax = Avg.Hvy.WSG + CI.Hvy.WSG, ymin = Avg.Hvy.WSG - CI.Hvy.WSG, color = Herbicide.Treatment),
+  geom_errorbar(aes(ymax = Avg.Hvy.WSG + SE.Hvy.WSG, ymin = Avg.Hvy.WSG - SE.Hvy.WSG, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5, shape = 21:23) +
   #geom_text(label = "NS", x = 0.7, y = 55) + 
@@ -132,13 +133,13 @@ cgr.wsg14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Hvy.WSG)) +
   pref.theme; cgr.wsg14.plt
 
 ugr.wsg14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Hvy.WSG)) +
-  geom_errorbar(aes(ymax = Avg.Hvy.WSG + CI.Hvy.WSG, ymin = Avg.Hvy.WSG - CI.Hvy.WSG, color = Herbicide.Treatment),
+  geom_errorbar(aes(ymax = Avg.Hvy.WSG + SE.Hvy.WSG, ymin = Avg.Hvy.WSG - SE.Hvy.WSG, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5, shape = 21:23) +
   #geom_text(label = "NS", x = 0.7, y = 80) + 
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
-  ylim(-3, 6) +
+  ylim(0, 6) +
   labs(x = "Pre-Treatment", y = "Heavy WSG Quadrats (#)") +
   pref.theme; ugr.wsg14.plt
 
@@ -162,7 +163,7 @@ ugr.wsg.plt <- ggplot(ugr, aes(x = Herbicide.Treatment, y = Hvy.WSG, fill = Herb
   geom_text(label = "a", x = 0.9, y = 0.3) +
   geom_text(label = "ab", x = 1.8, y = 1.3) +
   geom_text(label = "b", x = 2.9, y = 2.8) +
-  ylim(-3, 6) +
+  ylim(0, 6) +
   labs(x = "Post-Treatment") +
   pref.theme + no.y.axis; ugr.wsg.plt
 
@@ -182,7 +183,7 @@ ggplot2::ggsave("./Figures/Objective 2/Hvy.WSG_Hay.pdf", width = 8, height = 6, 
 ##  -------------------------------------------------------------------------  ##
 # Pre-treatment
 cgr.fsc14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Hvy.Fesc)) +
-  geom_errorbar(aes(ymax = Avg.Hvy.Fesc + CI.Hvy.Fesc, ymin = Avg.Hvy.Fesc - CI.Hvy.Fesc, color = Herbicide.Treatment),
+  geom_errorbar(aes(ymax = Avg.Hvy.Fesc + SE.Hvy.Fesc, ymin = Avg.Hvy.Fesc - SE.Hvy.Fesc, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5, shape = 21:23) +
   #geom_text(label = "NS", x = 0.7, y = 80) + 
@@ -193,13 +194,13 @@ cgr.fsc14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Hvy.Fesc)) 
   pref.theme; cgr.fsc14.plt
 
 ugr.fsc14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Hvy.Fesc)) +
-  geom_errorbar(aes(ymax = Avg.Hvy.Fesc + CI.Hvy.Fesc, ymin = Avg.Hvy.Fesc - CI.Hvy.Fesc, color = Herbicide.Treatment),
+  geom_errorbar(aes(ymax = Avg.Hvy.Fesc + SE.Hvy.Fesc, ymin = Avg.Hvy.Fesc - SE.Hvy.Fesc, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5, shape = 21:23) +
   #geom_text(label = "NS", x = 0.7, y = 80) + 
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
-  ylim(-1, 2) +
+  ylim(0, 2) +
   labs(x = "Pre-Treatment", y = "Heavy Fescue Quadrats (#)") +
   pref.theme; ugr.fsc14.plt
 
@@ -220,7 +221,7 @@ ugr.fsc.plt <- ggplot(ugr, aes(x = Herbicide.Treatment, y = Hvy.Fesc, fill = Her
   geom_text(label = "a", x = 0.9, y = 1.1) +
   geom_text(label = "ab", x = 1.8, y = 0.1) +
   geom_text(label = "b", x = 2.9, y = 0.1) +
-  ylim(-1, 2) +
+  ylim(0, 2) +
   labs(x = "Post-Treatment") +
   pref.theme + no.y.axis; ugr.fsc.plt
 

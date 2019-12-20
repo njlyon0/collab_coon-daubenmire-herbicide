@@ -43,7 +43,8 @@ ugr.colors <- c("Con" = "#4575b4", "Spr" = "#74add1", "SnS" = "#abd9e9") # shade
 dodge <- position_dodge(width = 0.5)
 pref.theme <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                     panel.background = element_blank(), axis.line = element_line(colour = "black"), 
-                    legend.title = element_blank(), legend.position = "none")
+                    legend.title = element_blank(), legend.position = "none",
+                    axis.text = element_text(size = 14), axis.title = element_text(size = 16))
 
 ##  -------------------------------------------------------------------------  ##
                         # CSG ####
