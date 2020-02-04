@@ -101,8 +101,8 @@ cgr.fsc.plt <- ggplot(cgr.fsc.pltdf, aes(x = Year, y = Fescue, shape = Herbicide
                 width = 0.3, position = dodge) +
   geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "a", x = 14.7, y = 45, color = "black") +
-  geom_text(label = "b", x = 14.7, y = 20, color = "black") +
+#  geom_text(label = "a", x = 14.7, y = 45, color = "black") +
+ # geom_text(label = "b", x = 14.7, y = 20, color = "black") +
   scale_color_manual(values = cgr.colors) +
   scale_fill_manual(values = cgr.colors) +
   scale_shape_manual(values = 21:23) +
@@ -115,8 +115,8 @@ ugr.fsc.plt <- ggplot(ugr.fsc.pltdf, aes(x = Year, y = Fescue, shape = Herbicide
                 width = 0.3, position = dodge) +
   geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "a", x = 14.7, y = 22, color = "black") +
-  geom_text(label = "b", x = 14.7, y = 4, color = "black") +
+#  geom_text(label = "a", x = 14.7, y = 22, color = "black") +
+ # geom_text(label = "b", x = 14.7, y = 4, color = "black") +
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
   scale_shape_manual(values = 21:23) +
@@ -153,9 +153,9 @@ ugr.csg14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.CSG)) +
 cgr.csg.plt <- ggplot(cgr, aes(x = Herbicide.Treatment, y = CSG, fill = Herbicide.Treatment)) +
   geom_boxplot(outlier.shape = 21) +
   scale_fill_manual(values = cgr.colors) +
-  geom_text(label = "a", x = 0.9, y = 21, size = 6) +
-  geom_text(label = "ab", x = 1.8, y = 30, size = 6) +
-  geom_text(label = "b", x = 2.9, y = 34, size = 6) +
+#  geom_text(label = "a", x = 0.9, y = 21, size = 6) +
+ # geom_text(label = "ab", x = 1.8, y = 30, size = 6) +
+  #geom_text(label = "b", x = 2.9, y = 34, size = 6) +
   ylim(0, 55) +
   labs(x = "Post-Treatment") +
   pref.theme + no.y.axis; cgr.csg.plt
@@ -163,9 +163,9 @@ cgr.csg.plt <- ggplot(cgr, aes(x = Herbicide.Treatment, y = CSG, fill = Herbicid
 ugr.csg.plt <- ggplot(ugr, aes(x = Herbicide.Treatment, y = CSG, fill = Herbicide.Treatment)) +
   geom_boxplot(outlier.shape = 21) +
   scale_fill_manual(values = ugr.colors) +
-  geom_text(label = "a", x = 0.9, y = 63, size = 6) +
-  geom_text(label = "ab", x = 1.8, y = 44, size = 6) +
-  geom_text(label = "b", x = 2.9, y = 35, size = 6) +
+#  geom_text(label = "a", x = 0.9, y = 63, size = 6) +
+ # geom_text(label = "ab", x = 1.8, y = 44, size = 6) +
+  #geom_text(label = "b", x = 2.9, y = 35, size = 6) +
   ylim(0, 80) +
   labs(x = "Post-Treatment") +
   pref.theme + no.y.axis; ugr.csg.plt
@@ -201,7 +201,7 @@ cgr.wsg.plt <- ggplot(cgr.wsg.pltdf, aes(x = Year, y = WSG, shape = Herbicide.Tr
                 width = 0.3, position = dodge) +
   geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype = 2) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "NS", x = 14.8, y = 40, color = "black", size = 6) +
+ # geom_text(label = "NS", x = 14.8, y = 40, color = "black", size = 6) +
   scale_color_manual(values = cgr.colors) +
   scale_fill_manual(values = cgr.colors) +
   scale_shape_manual(values = 21:23) +
@@ -214,7 +214,7 @@ ugr.wsg.plt <- ggplot(ugr.wsg.pltdf, aes(x = Year, y = WSG, shape = Herbicide.Tr
                 width = 0.3, position = dodge) +
   geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype = 2) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "NS", x = 14.8, y = 45, color = "black", size = 6) +
+#  geom_text(label = "NS", x = 14.8, y = 45, color = "black", size = 6) +
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
   scale_shape_manual(values = 21:23) +
@@ -284,8 +284,8 @@ cgr.frb.plt <- ggplot(cgr.frb.pltdf, aes(x = Year, y = Forbs, shape = Herbicide.
                 width = 0.3, position = dodge) +
   geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "a", x = 14.7, y = 32, color = "black", size = 6) +
-  geom_text(label = "b", x = 14.7, y = 18, color = "black", size = 6) +
+#  geom_text(label = "a", x = 14.7, y = 32, color = "black", size = 6) +
+ # geom_text(label = "b", x = 14.7, y = 18, color = "black", size = 6) +
   scale_color_manual(values = cgr.colors) +
   scale_fill_manual(values = cgr.colors) +
   scale_shape_manual(values = 21:23) +
@@ -298,8 +298,8 @@ ugr.frb.plt <- ggplot(ugr.frb.pltdf, aes(x = Year, y = Forbs, shape = Herbicide.
                 width = 0.3, position = dodge) +
   geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "a", x = 14.7, y = 52, color = "black", size = 6) +
-  geom_text(label = "b", x = 14.7, y = 27, color = "black", size = 6) +
+#  geom_text(label = "a", x = 14.7, y = 52, color = "black", size = 6) +
+ # geom_text(label = "b", x = 14.7, y = 27, color = "black", size = 6) +
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
   scale_shape_manual(values = 21:23) +
@@ -347,7 +347,7 @@ ugr.smx.plt <- ggplot(ugr.smx.pltdf, aes(x = Year, y = Seedmix, shape = Herbicid
                 width = 0.3, position = dodge) +
   geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype = 2) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "NS", x = 14.8, y = 0.18, color = "black", size = 6) +
+#  geom_text(label = "NS", x = 14.8, y = 0.18, color = "black", size = 6) +
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
   scale_shape_manual(values = 21:23) +
@@ -379,10 +379,10 @@ cgr.vs.fsc.plt <- ggplot(cgr.vs, aes(x = Composite.Variable, y = Fescue, fill = 
   geom_boxplot(outlier.shape = 21) +
   scale_fill_manual(values = cgr.colors) +
   labs(x = "Year-Treatment", y = "Fescue (%)", title = "Grazed") +
-  geom_text(x = 2, y = 79, label = "A", size = 6) +
-  geom_segment(aes(x = 1, xend = 3, y = 75, yend = 75)) +
-  geom_text(x = 5, y = 51, label = "B", size = 6) +
-  geom_segment(aes(x = 4, xend = 6, y = 47, yend = 47)) +
+#  geom_text(x = 2, y = 79, label = "A", size = 6) +
+ # geom_segment(aes(x = 1, xend = 3, y = 75, yend = 75)) +
+  #geom_text(x = 5, y = 51, label = "B", size = 6) +
+  #geom_segment(aes(x = 4, xend = 6, y = 47, yend = 47)) +
   ylim(0, 80) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; cgr.vs.fsc.plt
@@ -391,7 +391,7 @@ ugr.vs.fsc.plt <- ggplot(ugr.vs, aes(x = Composite.Variable, y = Fescue, fill = 
   geom_boxplot(outlier.shape = 21) +
   scale_fill_manual(values = ugr.colors) +
   labs(x = "Year-Treatment", y = "Fescue (%)", title = "Un-Grazed") +
-  geom_text(x = 1, y = 75, label = "NS", size = 6) +
+#  geom_text(x = 1, y = 75, label = "NS", size = 6) +
   ylim(0, 75) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; ugr.vs.fsc.plt
@@ -401,7 +401,7 @@ cgr.vs.csg.plt <- ggplot(cgr.vs, aes(x = Composite.Variable, y = CSG, fill = Her
   geom_boxplot(outlier.shape = 21) +
   scale_fill_manual(values = cgr.colors) +
   labs(x = "Year-Treatment", y = "CSG (%)", title = "Grazed") +
-  geom_text(x = 1, y = 65, label = "NS", size = 6) +
+#  geom_text(x = 1, y = 65, label = "NS", size = 6) +
   ylim(0, 70) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; cgr.vs.csg.plt
@@ -410,10 +410,10 @@ ugr.vs.csg.plt <- ggplot(ugr.vs, aes(x = Composite.Variable, y = CSG, fill = Her
   geom_boxplot(outlier.shape = 21) +
   scale_fill_manual(values = ugr.colors) +
   labs(x = "Year-Treatment", y = "CSG (%)", title = "Un-Grazed") +
-  geom_text(x = 2, y = 61, label = "A", size = 6) +
-  geom_segment(aes(x = 1, xend = 3, y = 57, yend = 57)) +
-  geom_text(x = 5, y = 69, label = "B", size = 6) +
-  geom_segment(aes(x = 4, xend = 6, y = 65, yend = 65)) +
+  #geom_text(x = 2, y = 61, label = "A", size = 6) +
+  #geom_segment(aes(x = 1, xend = 3, y = 57, yend = 57)) +
+  #geom_text(x = 5, y = 69, label = "B", size = 6) +
+  #geom_segment(aes(x = 4, xend = 6, y = 65, yend = 65)) +
   ylim(0, 70) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; ugr.vs.csg.plt
@@ -423,7 +423,7 @@ cgr.vs.wsg.plt <- ggplot(cgr.vs, aes(x = Composite.Variable, y = WSG, fill = Her
   geom_boxplot(outlier.shape = 21) +
   scale_fill_manual(values = cgr.colors) +
   labs(x = "Year-Treatment", y = "WSG (%)", title = "Grazed") +
-  geom_text(x = 1, y = 45, label = "NS", size = 6) +
+#  geom_text(x = 1, y = 45, label = "NS", size = 6) +
   ylim(0, 45) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; cgr.vs.wsg.plt
@@ -432,7 +432,7 @@ ugr.vs.wsg.plt <- ggplot(ugr.vs, aes(x = Composite.Variable, y = WSG, fill = Her
   geom_boxplot(outlier.shape = 21) +
   scale_fill_manual(values = ugr.colors) +
   labs(x = "Year-Treatment", y = "WSG (%)", title = "Un-Grazed") +
-  geom_text(x = 1, y = 45, label = "NS", size = 6) +
+ # geom_text(x = 1, y = 45, label = "NS", size = 6) +
   ylim(0, 45) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; ugr.vs.wsg.plt
@@ -462,10 +462,10 @@ cgr.vs.frb.plt <- ggplot(cgr.vs, aes(x = Composite.Variable, y = Forbs, fill = H
   geom_boxplot(outlier.shape = 21) +
   scale_fill_manual(values = cgr.colors) +
   labs(x = "Year-Treatment", y = "Forbs (%)", title = "Grazed") +
-  geom_text(x = 2, y = 29, label = "A", size = 6) +
-  geom_segment(aes(x = 1, xend = 3, y = 25, yend = 25)) +
-  geom_text(x = 5, y = 56, label = "B", size = 6) +
-  geom_segment(aes(x = 4, xend = 6, y = 52, yend = 52)) +
+#  geom_text(x = 2, y = 29, label = "A", size = 6) +
+ # geom_segment(aes(x = 1, xend = 3, y = 25, yend = 25)) +
+#  geom_text(x = 5, y = 56, label = "B", size = 6) +
+#  geom_segment(aes(x = 4, xend = 6, y = 52, yend = 52)) +
   ylim(0, 55) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; cgr.vs.frb.plt
@@ -474,7 +474,7 @@ ugr.vs.frb.plt <- ggplot(ugr.vs, aes(x = Composite.Variable, y = Forbs, fill = H
   geom_boxplot(outlier.shape = 21) +
   scale_fill_manual(values = ugr.colors) +
   labs(x = "Year-Treatment", y = "Forbs (%)", title = "Un-Grazed") +
-  geom_text(x = 0.9, y = 58, label = "NS", size = 6) +
+#  geom_text(x = 0.9, y = 58, label = "NS", size = 6) +
   ylim(0, 60) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; ugr.vs.frb.plt
@@ -484,10 +484,10 @@ cgr.vs.smx.plt <- ggplot(cgr.vs, aes(x = Composite.Variable, y = Seedmix, fill =
   geom_boxplot(outlier.shape = 21) +
   scale_fill_manual(values = cgr.colors) +
   labs(x = "Year-Treatment", y = "Seedmix (Prop.)", title = "Grazed") +
-  geom_text(x = 2, y = 0.09, label = "A", size = 6) +
-  geom_segment(aes(x = 1, xend = 3, y = 0.08, yend = 0.08)) +
-  geom_text(x = 5, y = 0.19, label = "B", size = 6) +
-  geom_segment(aes(x = 4, xend = 6, y = 0.18, yend = 0.18)) +
+#  geom_text(x = 2, y = 0.09, label = "A", size = 6) +
+ # geom_segment(aes(x = 1, xend = 3, y = 0.08, yend = 0.08)) +
+#  geom_text(x = 5, y = 0.19, label = "B", size = 6) +
+#  geom_segment(aes(x = 4, xend = 6, y = 0.18, yend = 0.18)) +
   ylim(0, 0.2) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; cgr.vs.smx.plt
@@ -496,10 +496,10 @@ ugr.vs.smx.plt <- ggplot(ugr.vs, aes(x = Composite.Variable, y = Seedmix, fill =
   geom_boxplot(outlier.shape = 21) +
   scale_fill_manual(values = ugr.colors) +
   labs(x = "Year-Treatment", y = "Seedmix (Prop.)", title = "Un-Grazed") +
-  geom_text(x = 2, y = 0.06, label = "A", size = 6) +
-  geom_segment(aes(x = 1, xend = 3, y = 0.05, yend = 0.05)) +
-  geom_text(x = 5, y = 0.15, label = "B", size = 6) +
-  geom_segment(aes(x = 4, xend = 6, y = 0.14, yend = 0.14)) +
+#  geom_text(x = 2, y = 0.06, label = "A", size = 6) +
+ # geom_segment(aes(x = 1, xend = 3, y = 0.05, yend = 0.05)) +
+#  geom_text(x = 5, y = 0.15, label = "B", size = 6) +
+ # geom_segment(aes(x = 4, xend = 6, y = 0.14, yend = 0.14)) +
   ylim(0, 0.2) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; ugr.vs.smx.plt
