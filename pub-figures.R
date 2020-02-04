@@ -108,7 +108,7 @@ cgr.fsc.plt <- ggplot(cgr.fsc.pltdf, aes(x = Year, y = Fescue, shape = Herbicide
   scale_shape_manual(values = 21:23) +
   ylim(0, 90) +
   labs(x = "Post-Treatment") +
-  pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; cgr.fsc.plt
+  pref.theme + no.y.axis + theme(legend.position = c(0.2, 0.9)); cgr.fsc.plt
 
 ugr.fsc.plt <- ggplot(ugr.fsc.pltdf, aes(x = Year, y = Fescue, shape = Herbicide.Treatment)) +
   geom_errorbar(aes(ymax = Fescue + se, ymin = Fescue - se, color = Herbicide.Treatment),
@@ -122,7 +122,7 @@ ugr.fsc.plt <- ggplot(ugr.fsc.pltdf, aes(x = Year, y = Fescue, shape = Herbicide
   scale_shape_manual(values = 21:23) +
   ylim(0, 60) +
   labs(x = "Post-Treatment") +
-  pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; ugr.fsc.plt
+  pref.theme + no.y.axis + theme(legend.position = c(0.2, 0.9)); ugr.fsc.plt
 
 # Make the first row of the figure
 fsc.plt <- egg::ggarrange(cgr.fsc14.plt, cgr.fsc.plt, ugr.fsc14.plt, ugr.fsc.plt,
@@ -207,12 +207,12 @@ cgr.wsg.plt <- ggplot(cgr.wsg.pltdf, aes(x = Year, y = WSG, shape = Herbicide.Tr
   scale_shape_manual(values = 21:23) +
   ylim(0, 40) +
   labs(x = "Post-Treatment") +
-  pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; cgr.wsg.plt
+  pref.theme + no.y.axis; cgr.wsg.plt
 
 ugr.wsg.plt <- ggplot(ugr.wsg.pltdf, aes(x = Year, y = WSG, shape = Herbicide.Treatment)) +
   geom_errorbar(aes(ymax = WSG + se, ymin = WSG - se, color = Herbicide.Treatment),
                 width = 0.3, position = dodge) +
-  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype = 2) +
+  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype = 1) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
 #  geom_text(label = "NS", x = 14.8, y = 45, color = "black", size = 6) +
   scale_color_manual(values = ugr.colors) +
@@ -220,7 +220,7 @@ ugr.wsg.plt <- ggplot(ugr.wsg.pltdf, aes(x = Year, y = WSG, shape = Herbicide.Tr
   scale_shape_manual(values = 21:23) +
   ylim(0, 45) +
   labs(x = "Post-Treatment") +
-  pref.theme + theme(legend.position = c(0.3, 0.9)) + no.y.axis; ugr.wsg.plt
+  pref.theme + no.y.axis; ugr.wsg.plt
 
 # Make the third-and final-row of the figure
 wsg.plt <- egg::ggarrange(cgr.wsg14.plt, cgr.wsg.plt, ugr.wsg14.plt, ugr.wsg.plt,
@@ -291,7 +291,7 @@ cgr.frb.plt <- ggplot(cgr.frb.pltdf, aes(x = Year, y = Forbs, shape = Herbicide.
   scale_shape_manual(values = 21:23) +
   ylim(0, 60) +
   labs(x = "Post-Treatment") +
-  pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; cgr.frb.plt
+  pref.theme + no.y.axis + theme(legend.position = c(0.2, 0.9)); cgr.frb.plt
 
 ugr.frb.plt <- ggplot(ugr.frb.pltdf, aes(x = Year, y = Forbs, shape = Herbicide.Treatment)) +
   geom_errorbar(aes(ymax = Forbs + se, ymin = Forbs - se, color = Herbicide.Treatment),
@@ -305,7 +305,7 @@ ugr.frb.plt <- ggplot(ugr.frb.pltdf, aes(x = Year, y = Forbs, shape = Herbicide.
   scale_shape_manual(values = 21:23) +
   ylim(0, 75) +
   labs(x = "Post-Treatment") +
-  pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; ugr.frb.plt
+  pref.theme + no.y.axis + theme(legend.position = c(0.2, 0.9)); ugr.frb.plt
 
 # Pre-treatment seedmix graphs
 cgr.smx14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Seedmix)) +
@@ -340,7 +340,7 @@ cgr.smx.plt <- ggplot(cgr.smx.pltdf, aes(x = Year, y = Seedmix)) +
   scale_shape_manual(values = 21:23) +
   ylim(0, 0.2) +
   labs(x = "Post-Treatment") +
-  pref.theme + theme(legend.position = c(0.2, 0.9)) + no.y.axis; cgr.smx.plt
+  pref.theme + no.y.axis; cgr.smx.plt
 
 ugr.smx.plt <- ggplot(ugr.smx.pltdf, aes(x = Year, y = Seedmix, shape = Herbicide.Treatment)) +
   geom_errorbar(aes(ymax = Seedmix + se, ymin = Seedmix - se, color = Herbicide.Treatment),
@@ -353,7 +353,7 @@ ugr.smx.plt <- ggplot(ugr.smx.pltdf, aes(x = Year, y = Seedmix, shape = Herbicid
   scale_shape_manual(values = 21:23) +
   ylim(-0.001, 0.18) +
   labs(x = "Post-Treatment") +
-  pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; ugr.smx.plt
+  pref.theme + no.y.axis; ugr.smx.plt
 
 # Make the figure all at once
 fig.2 <- egg::ggarrange(cgr.frb14.plt, cgr.frb.plt, ugr.frb14.plt, ugr.frb.plt,
@@ -363,7 +363,7 @@ fig.2 <- egg::ggarrange(cgr.frb14.plt, cgr.frb.plt, ugr.frb14.plt, ugr.frb.plt,
                                    "B", "",  "",  ""))
 
 # Save out this larger figure
-ggplot2::ggsave("./Figures/For Manuscript/Figure-2.pdf", width = 10, height = 12, units = 'in', plot = fig.2)
+ggplot2::ggsave("./Figures/For Manuscript/Figure-3.pdf", width = 10, height = 12, units = 'in', plot = fig.2)
 
 ##  --------------------------------------------------------------  ##
               # Figure 4 -- Grasses '14 vs. '18 ####
