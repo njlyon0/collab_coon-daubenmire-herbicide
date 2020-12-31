@@ -14,7 +14,8 @@ library(Rmisc) # get summary values for plotting
 library(ggplot2); library(cowplot); library(gridExtra); library(egg) # Plotting
 
 # Set working directory (Also, "Session" menu to "Set Working Directory" works)
-setwd("~/Documents/School/Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
+#setwd("~/Documents/School/Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
+setwd("/cloud/project/")
 
 # Clear environment of other stuff
 rm(list = ls())
@@ -40,8 +41,11 @@ ugr.14 <- subset(sns.14, sns.14$Treatment == "None")
 
 # Plotting shortcuts
 sns.labs <- c("Con", "Spr", "SnS")
-cgr.colors <- c("Con" = "#d73027", "Spr" = "#f46d43", "SnS" = "#fdae61") # shades of red
-ugr.colors <- c("Con" = "#4575b4", "Spr" = "#74add1", "SnS" = "#abd9e9") # shades of blue
+#cgr.colors <- c("Con" = "#d73027", "Spr" = "#f46d43", "SnS" = "#fdae61") # shades of red - draft1
+cgr.colors <- c("Con" = "#ac261f", "Spr" = "#f77d73", "SnS" = "#fdbb7a") # shades of red
+#ugr.colors <- c("Con" = "#4575b4", "Spr" = "#74add1", "SnS" = "#abd9e9") # shades of blue - draft 1
+ugr.colors <- c("Con" = "#30517d", "Spr" = "#61a2cb", "SnS" = "#bfe2ee") # shades of blue
+
 dodge <- position_dodge(width = 0.5)
 pref.theme <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                     panel.background = element_blank(), axis.line = element_line(colour = "black"), 
@@ -53,7 +57,14 @@ no.y.axis <- theme(axis.title.y = element_blank(), axis.text.y = element_blank()
 ##  -------------------------------------------------------------------------  ##
                                 # CSG ####
 ##  -------------------------------------------------------------------------  ##
-# Plot pre-treatment differences
+
+
+#get summary stats
+cgr.csg.pltdf <- summarySE(data = cgr, measurevar = "CSG", groupvars = c("Year", "Herbicide.Treatment"))
+ugr.csg.pltdf <- summarySE(data = ugr, measurevar = "CSG", groupvars = c("Year", "Herbicide.Treatment"))
+
+
+# Plot pre-treatment differences - DONE
 cgr.csg14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.CSG)) +
   geom_errorbar(aes(ymax = Avg.CSG + SE.CSG, ymin = Avg.CSG - SE.CSG, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
@@ -65,7 +76,8 @@ cgr.csg14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.CSG)) +
   labs(x = "Pre-Treatment", y = "Cool-Season Grass (%)") +
   pref.theme; cgr.csg14.plt
 
-ugr.csg14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.CSG)) +
+#DONE
+ugr.csg14.plt <- ggplot(ugr.14 , aes(x = Herbicide.Treatment, y = Avg.CSG)) +
   geom_errorbar(aes(ymax = Avg.CSG + SE.CSG, ymin = Avg.CSG - SE.CSG, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5, shape = 21:23) +
@@ -76,7 +88,8 @@ ugr.csg14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.CSG)) +
   labs(x = "Pre-Treatment", y = "Cool-Season Grass (%)") +
   pref.theme; ugr.csg14.plt
 
-# Plot the post-treatment responses
+
+# Plot the post-treatment responses - DONE
 cgr.csg.plt <- ggplot(cgr, aes(x = Herbicide.Treatment, y = CSG, fill = Herbicide.Treatment)) +
   geom_boxplot(outlier.shape = 21) +
   scale_fill_manual(values = cgr.colors) +
@@ -87,12 +100,19 @@ cgr.csg.plt <- ggplot(cgr, aes(x = Herbicide.Treatment, y = CSG, fill = Herbicid
   labs(x = "Post-Treatment") +
   pref.theme + no.y.axis; cgr.csg.plt
 
-ugr.csg.plt <- ggplot(ugr, aes(x = Herbicide.Treatment, y = CSG, fill = Herbicide.Treatment)) +
-  geom_boxplot(outlier.shape = 21) +
+#DONE
+ugr.csg.plt <- ggplot(ugr.csg.pltdf, aes(x = Year, y = CSG, shape = Herbicide.Treatment)) +
+  #geom_boxplot(outlier.shape = 21) +
+  geom_errorbar(aes(ymax = CSG + se, ymin = CSG - se, color = Herbicide.Treatment),
+                width = 0.3, position = dodge) +
+  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F) +
+  geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
   scale_fill_manual(values = ugr.colors) +
-  geom_text(label = "a", x = 0.9, y = 63) +
-  geom_text(label = "ab", x = 1.8, y = 44) +
-  geom_text(label = "b", x = 2.9, y = 35) +
+  scale_color_manual(values = ugr.colors) +
+  scale_shape_manual(values = 21:23) +
+  #geom_text(label = "a", x = 0.9, y = 63) +
+  #geom_text(label = "ab", x = 1.8, y = 44) +
+  #geom_text(label = "b", x = 2.9, y = 35) +
   ylim(0, 80) +
   labs(x = "Post-Treatment") +
   pref.theme + no.y.axis; ugr.csg.plt
@@ -115,7 +135,7 @@ ggplot2::ggsave("./Figures/Objective 1/CSG_Hay.pdf", width = 8, height = 6, unit
 cgr.wsg.pltdf <- summarySE(data = cgr, measurevar = "WSG", groupvars = c("Year", "Herbicide.Treatment"))
 ugr.wsg.pltdf <- summarySE(data = ugr, measurevar = "WSG", groupvars = c("Year", "Herbicide.Treatment"))
 
-# Pre-treatment stuff
+# Pre-treatment stuff - DONE
 cgr.wsg14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.WSG)) +
   geom_errorbar(aes(ymax = Avg.WSG + SE.WSG, ymin = Avg.WSG - SE.WSG, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
@@ -127,6 +147,7 @@ cgr.wsg14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.WSG)) +
   labs(x = "Pre-Treatment", y = "Warm-Season Grass (%)") +
   pref.theme; cgr.wsg14.plt
 
+#DONE
 ugr.wsg14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.WSG)) +
   geom_errorbar(aes(ymax = Avg.WSG + SE.WSG, ymin = Avg.WSG - SE.WSG, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
@@ -134,17 +155,17 @@ ugr.wsg14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.WSG)) +
   #geom_text(label = "NS", x = 0.7, y = 45) + 
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
-  ylim(-14, 45) +
+  ylim(0, 45) +
   labs(x = "Pre-Treatment", y = "Warm-Season Grass (%)") +
   pref.theme; ugr.wsg14.plt
 
-# Plots
+# Plots - DONE
 cgr.wsg.plt <- ggplot(cgr.wsg.pltdf, aes(x = Year, y = WSG, shape = Herbicide.Treatment)) +
   geom_errorbar(aes(ymax = WSG + se, ymin = WSG - se, color = Herbicide.Treatment),
                 width = 0.3, position = dodge) +
-  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype = 2) +
+  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype=2) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "NS", x = 14.8, y = 40, color = "black") +
+ # geom_text(label = "NS", x = 14.8, y = 40, color = "black") +
   scale_color_manual(values = cgr.colors) +
   scale_fill_manual(values = cgr.colors) +
   scale_shape_manual(values = 21:23) +
@@ -152,16 +173,17 @@ cgr.wsg.plt <- ggplot(cgr.wsg.pltdf, aes(x = Year, y = WSG, shape = Herbicide.Tr
   labs(x = "Post-Treatment") +
   pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; cgr.wsg.plt
 
+#DONE
 ugr.wsg.plt <- ggplot(ugr.wsg.pltdf, aes(x = Year, y = WSG, shape = Herbicide.Treatment)) +
   geom_errorbar(aes(ymax = WSG + se, ymin = WSG - se, color = Herbicide.Treatment),
                 width = 0.3, position = dodge) +
-  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype = 2) +
+  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "NS", x = 14.8, y = 45, color = "black") +
+  #geom_text(label = "NS", x = 14.8, y = 45, color = "black") +
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
   scale_shape_manual(values = 21:23) +
-  ylim(-14, 45) +
+  ylim(0, 45) +
   labs(x = "Post-Treatment") +
   pref.theme + theme(legend.position = c(0.2, 0.9)) + no.y.axis; ugr.wsg.plt
 
@@ -183,7 +205,7 @@ ggplot2::ggsave("./Figures/Objective 1/WSG_Hay.pdf", width = 8, height = 6, unit
 cgr.fsc.pltdf <- summarySE(data = cgr, measurevar = "Fescue", groupvars = c("Year", "Herbicide.Treatment"))
 ugr.fsc.pltdf <- summarySE(data = ugr, measurevar = "Fescue", groupvars = c("Year", "Herbicide.Treatment"))
 
-# Pre-treatment stuff
+# Pre-treatment stuff - DONE
 cgr.fsc14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Fescue)) +
   geom_errorbar(aes(ymax = Avg.Fescue + SE.Fescue, ymin = Avg.Fescue - SE.Fescue, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
@@ -195,6 +217,7 @@ cgr.fsc14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Fescue)) +
   labs(x = "Pre-Treatment", y = "Fescue (%)") +
   pref.theme; cgr.fsc14.plt
 
+#DONE
 ugr.fsc14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Fescue)) +
   geom_errorbar(aes(ymax = Avg.Fescue + SE.Fescue, ymin = Avg.Fescue - SE.Fescue, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
@@ -206,7 +229,7 @@ ugr.fsc14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Fescue)) +
   labs(x = "Pre-Treatment", y = "Fescue (%)") +
   pref.theme; ugr.fsc14.plt
 
-# Plots
+# Plots 
 cgr.fsc.plt <- ggplot(cgr.fsc.pltdf, aes(x = Year, y = Fescue, shape = Herbicide.Treatment)) +
   geom_errorbar(aes(ymax = Fescue + se, ymin = Fescue - se, color = Herbicide.Treatment),
                 width = 0.3, position = dodge) +
@@ -221,19 +244,26 @@ cgr.fsc.plt <- ggplot(cgr.fsc.pltdf, aes(x = Year, y = Fescue, shape = Herbicide
   labs(x = "Post-Treatment") +
   pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; cgr.fsc.plt
 
-ugr.fsc.plt <- ggplot(ugr.fsc.pltdf, aes(x = Year, y = Fescue, shape = Herbicide.Treatment)) +
-  geom_errorbar(aes(ymax = Fescue + se, ymin = Fescue - se, color = Herbicide.Treatment),
-                width = 0.3, position = dodge) +
-  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F) +
-  geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "a", x = 14.7, y = 22, color = "black") +
-  geom_text(label = "b", x = 14.7, y = 4, color = "black") +
-  scale_color_manual(values = ugr.colors) +
-  scale_fill_manual(values = ugr.colors) +
-  scale_shape_manual(values = 21:23) +
+#DONE
+ugr.fsc.plt <- ggplot(ugr, aes(x = Herbicide.Treatment, y = Fescue, fill = Herbicide.Treatment)) +
+    geom_boxplot(outlier.shape = 21) +
+    scale_fill_manual(values = ugr.colors) +
+    geom_text(label = "a", x = 0.9, y = 21) +
+    geom_text(label = "ab", x = 1.8, y = 30) +
+    geom_text(label = "b", x = 2.9, y = 34) +
+  #geom_errorbar(aes(ymax = Fescue + se, ymin = Fescue - se, color = Herbicide.Treatment),
+  #              width = 0.3, position = dodge) +
+  #geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F) +
+  #geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
+  #geom_text(label = "a", x = 14.7, y = 22, color = "black") +
+  #geom_text(label = "b", x = 14.7, y = 4, color = "black") +
+  #scale_color_manual(values = ugr.colors) +
+  #scale_fill_manual(values = ugr.colors) +
+ # scale_shape_manual(values = 21:23) +
   ylim(0, 60) +
   labs(x = "Post-Treatment") +
   pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; ugr.fsc.plt
+
 
 # Check out all four plots together
 egg::ggarrange(cgr.fsc14.plt, cgr.fsc.plt, ugr.fsc14.plt, ugr.fsc.plt, 
@@ -253,7 +283,7 @@ ggplot2::ggsave("./Figures/Objective 1/Fescue_Hay.pdf", width = 8, height = 6, u
 cgr.smx.pltdf <- summarySE(data = cgr, measurevar = "Seedmix", groupvars = c("Year", "Herbicide.Treatment"))
 ugr.smx.pltdf <- summarySE(data = ugr, measurevar = "Seedmix", groupvars = c("Year", "Herbicide.Treatment"))
 
-# Pre-treatment stuff
+# Pre-treatment stuff - DONE
 cgr.smx14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Seedmix)) +
   geom_errorbar(aes(ymax = Avg.Seedmix + SE.Seedmix, ymin = Avg.Seedmix - SE.Seedmix, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
@@ -265,6 +295,7 @@ cgr.smx14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Seedmix)) +
   labs(x = "Pre-Treatment", y = "Seedmix (Proportion >25%)") +
   pref.theme; cgr.smx14.plt
 
+#DONE
 ugr.smx14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Seedmix)) +
   geom_errorbar(aes(ymax = Avg.Seedmix + SE.Seedmix, ymin = Avg.Seedmix - SE.Seedmix, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
@@ -276,14 +307,14 @@ ugr.smx14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Seedmix)) +
   labs(x = "Pre-Treatment", y = "Seedmix (Proportion >25%)") +
   pref.theme; ugr.smx14.plt
 
-# Plots
+# Plots - DONE
 cgr.smx.plt <- ggplot(cgr.smx.pltdf, aes(x = Year, y = Seedmix)) +
   geom_errorbar(aes(ymax = Seedmix + se, ymin = Seedmix - se, color = Herbicide.Treatment),
                 width = 0.3, position = dodge) +
   geom_smooth(method = "lm", se = F, color = "black") +
   geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype = 2) +
   geom_point(aes(fill = Herbicide.Treatment, shape = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "NS", x = 14.7, y = 0.18, color = "black") +
+ # geom_text(label = "NS", x = 14.7, y = 0.18, color = "black") +
   scale_color_manual(values = cgr.colors) +
   scale_fill_manual(values = cgr.colors) +
   scale_shape_manual(values = 21:23) +
@@ -291,12 +322,13 @@ cgr.smx.plt <- ggplot(cgr.smx.pltdf, aes(x = Year, y = Seedmix)) +
   labs(x = "Post-Treatment") +
   pref.theme + theme(legend.position = c(0.2, 0.9)) + no.y.axis; cgr.smx.plt
 
+#DONE
 ugr.smx.plt <- ggplot(ugr.smx.pltdf, aes(x = Year, y = Seedmix, shape = Herbicide.Treatment)) +
   geom_errorbar(aes(ymax = Seedmix + se, ymin = Seedmix - se, color = Herbicide.Treatment),
                 width = 0.3, position = dodge) +
   geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype = 2) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "NS", x = 14.7, y = 0.18, color = "black") +
+  #geom_text(label = "NS", x = 14.7, y = 0.18, color = "black") +
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
   scale_shape_manual(values = 21:23) +
@@ -322,7 +354,7 @@ ggplot2::ggsave("./Figures/Objective 1/Seedmix_Hay.pdf", width = 8, height = 6, 
 cgr.frb.pltdf <- summarySE(data = cgr, measurevar = "Forbs", groupvars = c("Year", "Herbicide.Treatment"))
 ugr.frb.pltdf <- summarySE(data = ugr, measurevar = "Forbs", groupvars = c("Year", "Herbicide.Treatment"))
 
-# Pre-treatment stuff
+# Pre-treatment stuff - DONE
 cgr.frb14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Forbs)) +
   geom_errorbar(aes(ymax = Avg.Forbs + SE.Forbs, ymin = Avg.Forbs - SE.Forbs, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
@@ -334,6 +366,7 @@ cgr.frb14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Forbs)) +
   labs(x = "Pre-Treatment", y = "Forbs (%)") +
   pref.theme; cgr.frb14.plt
 
+#DONE
 ugr.frb14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Forbs)) +
   geom_errorbar(aes(ymax = Avg.Forbs + SE.Forbs, ymin = Avg.Forbs - SE.Forbs, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
@@ -345,14 +378,14 @@ ugr.frb14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Forbs)) +
   labs(x = "Pre-Treatment", y = "Forbs (%)") +
   pref.theme; ugr.frb14.plt
 
-# Plots
+# Plots - DONE
 cgr.frb.plt <- ggplot(cgr.frb.pltdf, aes(x = Year, y = Forbs, shape = Herbicide.Treatment)) +
   geom_errorbar(aes(ymax = Forbs + se, ymin = Forbs - se, color = Herbicide.Treatment),
                 width = 0.3, position = dodge) +
-  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F) +
+  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype=2) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "a", x = 14.7, y = 32, color = "black") +
-  geom_text(label = "b", x = 14.7, y = 18, color = "black") +
+  #geom_text(label = "a", x = 14.7, y = 32, color = "black") +
+  #geom_text(label = "b", x = 14.7, y = 18, color = "black") +
   scale_color_manual(values = cgr.colors) +
   scale_fill_manual(values = cgr.colors) +
   scale_shape_manual(values = 21:23) +
@@ -360,13 +393,14 @@ cgr.frb.plt <- ggplot(cgr.frb.pltdf, aes(x = Year, y = Forbs, shape = Herbicide.
   labs(x = "Post-Treatment") +
   pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; cgr.frb.plt
 
+#DONE
 ugr.frb.plt <- ggplot(ugr.frb.pltdf, aes(x = Year, y = Forbs, shape = Herbicide.Treatment)) +
   geom_errorbar(aes(ymax = Forbs + se, ymin = Forbs - se, color = Herbicide.Treatment),
                 width = 0.3, position = dodge) +
-  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F) +
+  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype=2) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "a", x = 14.7, y = 52, color = "black") +
-  geom_text(label = "b", x = 14.7, y = 27, color = "black") +
+  #geom_text(label = "a", x = 14.7, y = 52, color = "black") +
+  #geom_text(label = "b", x = 14.7, y = 27, color = "black") +
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
   scale_shape_manual(values = 21:23) +
@@ -392,7 +426,21 @@ ggplot2::ggsave("./Figures/Objective 1/Forbs_Hay.pdf", width = 8, height = 6, un
 cgr.lgm.pltdf <- summarySE(data = cgr, measurevar = "Legumes", groupvars = c("Year", "Herbicide.Treatment"))
 ugr.lgm.pltdf <- summarySE(data = ugr, measurevar = "Legumes", groupvars = c("Year", "Herbicide.Treatment"))
 
-# Pre-treatment stuff
+library("ggeffects")
+library("lme4")
+
+#legume_model_gr = lmer(Legumes ~ Herbicide.Treatment * year2 + (1|Pasture), data = cgr.post, REML=FALSE)
+#ggpredict(legume_model_gr,c("Herbicide.Treatment", "year2 [1,2,3,4]"),ci.lvl=0.85, back.transform=TRUE, append=TRUE)
+#legume_model_gr_Pred = as.data.frame(ggpredict(legume_model_gr,c("Herbicide.Treatment", "year2 [1,2,3,4]"),ci.lvl=0.85, back.transform=TRUE, append=TRUE))
+#colnames(legume_model_gr_Pred)=c("Herbicide.Treatment", "Predicted","SE","Lower","Upper","year2") #renames columns
+##View(Orth_Pred) 
+#confint(Orth_Top, level = 0.85)
+
+#legume_model_gr_sum= legume_model_gr_Pred %>% 
+#  group_by(year2) %>% 
+#  summarise_at(vars(Predicted, Lower, Upper), mean)
+
+# Pre-treatment stuff -DONE
 cgr.lgm14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Legumes)) +
   geom_errorbar(aes(ymax = Avg.Legumes + SE.Legumes, ymin = Avg.Legumes - SE.Legumes, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
@@ -404,6 +452,7 @@ cgr.lgm14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Legumes)) +
   labs(x = "Pre-Treatment", y = "Legumes (%)") +
   pref.theme; cgr.lgm14.plt
 
+#DONE
 ugr.lgm14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Legumes)) +
   geom_errorbar(aes(ymax = Avg.Legumes + SE.Legumes, ymin = Avg.Legumes - SE.Legumes, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
@@ -415,29 +464,37 @@ ugr.lgm14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Legumes)) +
   labs(x = "Pre-Treatment", y = "Legumes (%)") +
   pref.theme; ugr.lgm14.plt
 
-# Plots
-cgr.lgm.plt <- ggplot(cgr.lgm.pltdf, aes(x = Year, y = Legumes, shape = Herbicide.Treatment)) +
+# Plots - DONE
+
+#trialplot = ggplot(legume_model_gr_sum, aes(x=year2,y=Predicted))+
+#  geom_point(aes(x=year2,y=Predicted))+
+#  ylim(0, 50) 
+#trialplot
+
+cgr.lgm.plt <- ggplot(cgr.lgm.pltdf, aes(x = Year, y = Legumes)) +
   geom_errorbar(aes(ymax = Legumes + se, ymin = Legumes - se, color = Herbicide.Treatment),
                 width = 0.3, position = dodge) +
-  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F) +
-  geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
+  geom_smooth(method = "lm", se = F, color = "black") +
+  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype = 2) +
+  geom_point(aes(fill = Herbicide.Treatment, shape=Herbicide.Treatment), position = dodge, size = 2.5) +
   scale_color_manual(values = cgr.colors) +
   scale_fill_manual(values = cgr.colors) +
   scale_shape_manual(values = 21:23) +
   ylim(0, 50) +
-  labs(x = "Post-Treatment") +
+  labs(x = "Post-Treatment")+
   pref.theme + theme(legend.position = c(0.1, 0.9)) + no.y.axis; cgr.lgm.plt
 
+#DONE
 ugr.lgm.plt <- ggplot(ugr.lgm.pltdf, aes(x = Year, y = Legumes, shape = Herbicide.Treatment)) +
   geom_errorbar(aes(ymax = Legumes + se, ymin = Legumes - se, color = Herbicide.Treatment),
                 width = 0.3, position = dodge) +
-  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype = 2) +
+  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F) +
   geom_point(aes(fill = Herbicide.Treatment), position = dodge, size = 2.5) +
-  geom_text(label = "NS", x = 14.7, y = 50) + 
+  #geom_text(label = "NS", x = 14.7, y = 50) + 
   scale_color_manual(values = ugr.colors) +
   scale_fill_manual(values = ugr.colors) +
   scale_shape_manual(values = 21:23) +
-  ylim(-2, 50) +
+  ylim(0, 50) +
   labs(x = "Post-Treatment") +
   pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; ugr.lgm.plt
 
@@ -520,10 +577,10 @@ ggplot2::ggsave("./Figures/Objective 1/Woody_Hay.pdf", width = 8, height = 6, un
                     # Panic Proportion Occurrence ####
 ##  -------------------------------------------------------------------------  ##
 # Get summary stats for plotting
-cgr.pnc.pltdf <- summarySE(data = cgr, measurevar = "Panic", groupvars = "Year")
+cgr.pnc.pltdf <- summarySE(data = cgr, measurevar = "Panic", groupvars = c("Year","Herbicide.Treatment"))
 ugr.pnc.pltdf <- summarySE(data = ugr, measurevar = "Panic", groupvars = c("Year", "Herbicide.Treatment"))
 
-# Pre-treatment stuff
+# Pre-treatment stuff - DONE
 cgr.pnc14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Panic)) +
   geom_errorbar(aes(ymax = Avg.Panic + SE.Panic, ymin = Avg.Panic - SE.Panic, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
@@ -535,6 +592,7 @@ cgr.pnc14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Panic)) +
   labs(x = "Pre-Treatment", y = "Panic (Proportion Present)") +
   pref.theme; cgr.pnc14.plt
 
+#DONE
 ugr.pnc14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Panic)) +
   geom_errorbar(aes(ymax = Avg.Panic + SE.Panic, ymin = Avg.Panic - SE.Panic, color = Herbicide.Treatment),
                 width = 0.5, position = dodge) +
@@ -546,25 +604,33 @@ ugr.pnc14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Panic)) +
   labs(x = "Pre-Treatment", y = "Panic (Proportion Present)") +
   pref.theme; ugr.pnc14.plt
 
-# Plots
-cgr.pnc.plt <- ggplot(cgr.pnc.pltdf, aes(x = Year, y = Panic, color = rep("x", 4),
-                                         fill = rep("x", 4), shape = rep("x", 4))) +
-  geom_errorbar(aes(ymax = Panic + se, ymin = Panic - se), width = 0.3, position = dodge) +
-  geom_smooth(method = 'lm', se = F) +
-  geom_point(position = dodge, size = 2.5) +
-  scale_color_manual(values = "black") +
-  scale_fill_manual(values = "gray") +
-  scale_shape_manual(values = 24) +
+# Plots - DONE
+cgr.pnc.plt <- ggplot(cgr.pnc.pltdf, aes(x = Year, y = Panic)) +
+  geom_errorbar(aes(ymax = Panic + se, ymin = Panic - se, color = Herbicide.Treatment),
+                width = 0.3, position = dodge) +
+  geom_smooth(method = 'lm', se = F, color="Black") +
+  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F, linetype = 2) +
+  geom_point(aes(fill = Herbicide.Treatment, shape=Herbicide.Treatment), position = dodge, size = 2.5) +
+  scale_color_manual(values = cgr.colors) +
+  scale_fill_manual(values = cgr.colors) +
+  scale_shape_manual(values = 21:23) +
   ylim(0, 1) +
   labs(x = "Post-Treatment") +
   pref.theme + no.y.axis; cgr.pnc.plt
 
-ugr.pnc.plt <- ggplot(ugr, aes(x = Herbicide.Treatment, y = Panic, fill = Herbicide.Treatment)) +
-  geom_boxplot(outlier.shape = 21) +
+#DONE
+ugr.pnc.plt <- ggplot(ugr.pnc.pltdf, aes(x = Year, y = Panic, shape = Herbicide.Treatment)) +
+  #geom_boxplot(outlier.shape = 21) +
+  geom_errorbar(aes(ymax = Panic + se, ymin = Panic - se, color = Herbicide.Treatment),
+                width = 0.3, position = dodge) +
+  geom_smooth(aes(color = Herbicide.Treatment), method = 'lm', se = F) +
+  geom_point(aes(fill = Herbicide.Treatment, shape=Herbicide.Treatment), position = dodge, size = 2.5) +
+#  geom_text(label = "a", x = 0.8, y = 0.1, color = "black") +
+#  geom_text(label = "ab", x = 1.7, y = 0.35, color = "black") +
+#  geom_text(label = "b", x = 2.8, y = 0.33, color = "black") +
   scale_fill_manual(values = ugr.colors) +
-  geom_text(label = "a", x = 0.8, y = 0.1, color = "black") +
-  geom_text(label = "ab", x = 1.7, y = 0.35, color = "black") +
-  geom_text(label = "b", x = 2.8, y = 0.33, color = "black") +
+  scale_color_manual(values = ugr.colors) +
+  scale_shape_manual(values = 21:23) +
   ylim(0, 1) +
   labs(x = "Post-Treatment") +
   pref.theme + no.y.axis; ugr.pnc.plt 

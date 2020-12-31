@@ -16,7 +16,7 @@ setwd("/cloud/project/")
   ## if you're not me you will need to re-set this to your own computer.
 
 # Clear the environment
-rm(list = ls())
+#rm(list = ls())
 
 # Load required libraries
 
@@ -46,17 +46,8 @@ ugr.post <- subset(sns.post, sns.post$Treatment == "None")
 cgr.vs <- subset(sns.vs, sns.vs$Treatment == "GB")
 ugr.vs <- subset(sns.vs, sns.vs$Treatment == "None")
 
-
-
-#ugr.vs.edited %>%
-#  group_by(as.factor(Year),Herbicide.Treatment) %>%
-#  summarize(Mean = mean(Fescue, na.rm=TRUE))
-#ugr.vs %>%
-#  group_by(as.factor(Year),Herbicide.Treatment) %>%
-#  summarize(Mean = mean(Fescue, na.rm=TRUE))
-
-
-
+cgr.post$year2=(cgr.post$Year-14)
+ugr.post$year2=(ugr.post$Year-14) #recoding year to be 1,2,3,4
 
 #determining forb averages for the 25% threshold
 
@@ -70,7 +61,6 @@ mean(cgr.vs$Forbs) #20%
 # Double check the structure of the data
 str(cgr.post)
 
-cgr.post$year2=(cgr.post$Year-14) #recoding year to be 1,2,3,4
 
 # CSG ~ treatment * year
 CSG_model_gr=lmer(CSG ~ Herbicide.Treatment * year2 + (1|Pasture), data = cgr.post, REML=FALSE)
@@ -111,8 +101,6 @@ legume_model_gr = lmer(Legumes ~ Herbicide.Treatment * year2 + (1|Pasture), data
 summary(legume_model_gr)
 anova(legume_model_gr)
 #lsmeans(legume_model_gr, pairwise ~ Herbicide.Treatment, adjust="none",mode="satterthwaite")
-
-
 
 # Woody ~ treatment * year
 woody_model_gr = lmer(Woody ~ Herbicide.Treatment * year2 + (1|Pasture), data = cgr.post, REML=FALSE)
@@ -166,7 +154,7 @@ summary(litter_model_gr)
 Robel_model_gr = lmer(Robel ~ Herbicide.Treatment * year2 + (1|Pasture), data = cgr.post, REML=FALSE)
 anova(Robel_model_gr)
 summary(Robel_model_gr)
-#lsmeans(Robel_model_gr, pairwise ~ Herbicide.Treatment, adjust="none",mode="satterthwaite")
+lsmeans(Robel_model_gr, pairwise ~ Herbicide.Treatment*year2, adjust="none",mode="satterthwaite")
 
 
 # Litter Depth ~ treatment * year
@@ -181,16 +169,11 @@ summary(litdep_model_gr)
 # Double check the structure of the data
 str(ugr.post)
 
-ugr.post$year2=(ugr.post$Year-14) #recoding year to be 1,2,3,4
-
-
 # CSG ~ treatment * year
 CSG_model_ugr = lmer(CSG ~ Herbicide.Treatment * year2 + (1|Pasture), data = ugr.post, REML=FALSE)
 summary(CSG_model_ugr)
 anova(CSG_model_ugr)
-lsmeans(CSG_model_ugr, pairwise ~ Herbicide.Treatment, adjust="none",mode="satterthwaite")
-
-
+lsmeans(CSG_model_ugr, pairwise ~ Herbicide.Treatment*year2, adjust="none",mode="satterthwaite")
 
 # WSG ~ treatment * year
 WSG_model_ugr = lmer(WSG ~ Herbicide.Treatment * year2 + (1|Pasture), data = ugr.post, REML=FALSE)
@@ -203,7 +186,7 @@ lsmeans(WSG_model_ugr, pairwise ~ Herbicide.Treatment, adjust="none",mode="satte
 fescue_model_ugr = lmer(Fescue ~ Herbicide.Treatment * year2 + (1|Pasture), data = ugr.post, REML=FALSE)
 summary(fescue_model_ugr)
 anova(fescue_model_ugr)
-lsmeans(fescue_model_ugr, pairwise ~ Herbicide.Treatment, adjust="none",mode="satterthwaite")
+lsmeans(fescue_model_ugr, pairwise ~ Herbicide.Treatment*year2, adjust="none",mode="satterthwaite")
 
 
 # Seedmix ~ treatment * year
@@ -217,7 +200,7 @@ anova(seedmix_model_ugr)
 forb_model_ugr = lmer(Forbs ~ Herbicide.Treatment * Year + (1|Pasture), data = ugr.post, REML=FALSE)
 summary(forb_model_ugr)
 anova(forb_model_ugr)
-#lsmeans(forb_model_ugr, pairwise ~ Herbicide.Treatment, adjust="none",mode="satterthwaite")
+lsmeans(forb_model_ugr, pairwise ~ Herbicide.Treatment*year2, adjust="none",mode="satterthwaite")
 
 
 # Legumes ~ treatment * year
@@ -225,7 +208,6 @@ legume_model_ugr = lmer(Legumes ~ Herbicide.Treatment * year2 + (1|Pasture), dat
 summary(legume_model_ugr)
 anova(legume_model_ugr)
 lsmeans(legume_model_ugr, pairwise ~ Herbicide.Treatment, adjust="none",mode="satterthwaite")
-
 
 
 # Woody ~ treatment * year
@@ -306,14 +288,13 @@ lsmeans(WSG_vs_model_gr, pairwise ~ Herbicide.Treatment*Year, adjust="none",mode
 fescue_vs_model_gr = lmer(Fescue ~ Herbicide.Treatment * as.factor(Year) + (1|Pasture), data = cgr.vs, REML=FALSE)
 summary(fescue_vs_model_gr)
 anova(fescue_vs_model_gr)
-lsmeans(fescue_vs_model_gr, pairwise ~ Herbicide.Treatment*Year, adjust="none",mode="satterthwaite")
+lsmeans(fescue_vs_model_gr, pairwise ~ Herbicide.Treatment*as.factor(Year), adjust="none",mode="satterthwaite")
 
 # Seedmix ~ treatment * year
 seedmix_vs_model_gr = lmer(Seedmix ~ Herbicide.Treatment * as.factor(Year) + (1|Pasture), data = cgr.vs, REML=FALSE)
 summary(seedmix_vs_model_gr)
 anova(seedmix_vs_model_gr)
 lsmeans(seedmix_vs_model_gr, pairwise ~ Herbicide.Treatment*Year, adjust="none",mode="satterthwaite")
-
 
 
 # Forbs ~ treatment * year
@@ -393,10 +374,6 @@ lsmeans(litdep_vs_model_gr, pairwise ~ Herbicide.Treatment*Year, adjust="none",m
 # Double check the structure of the data
 str(ugr.vs)
 
-#git config --global user.email "coonjaime@gmail.com.com"
-#git config --global user.name "Jaime Coon"
-
-
 # CSG ~ treatment  * as.factor(Year)
 CSG_vs_model_ugr = lmer(CSG ~ Herbicide.Treatment  * as.factor(Year) + (1|Pasture), data = ugr.vs, REML=FALSE)
 summary(CSG_vs_model_ugr)
@@ -415,7 +392,7 @@ lsmeans(WSG_vs_model_ugr, pairwise ~ Herbicide.Treatment*Year, adjust="none",mod
 fescue_vs_model_ugr = lmer(Fescue ~ Herbicide.Treatment  * as.factor(Year) + (1|Pasture), data = ugr.vs, REML=FALSE)
 summary(fescue_vs_model_ugr)
 anova(fescue_vs_model_ugr)
-lsmeans(fescue_vs_model_ugr, pairwise ~ Herbicide.Treatment*Year, adjust="none",mode="satterthwaite")
+lsmeans(fescue_vs_model_ugr, pairwise ~ Herbicide.Treatment*(Year), adjust="none",mode="satterthwaite")
 
 
 # Seedmix ~ treatment  * as.factor(Year)
@@ -429,7 +406,6 @@ lsmeans(seedmix_vs_model_ugr, pairwise ~ Herbicide.Treatment*Year, adjust="none"
 forbs_vs_model_ugr = lmer(Forbs ~ Herbicide.Treatment  * as.factor(Year) + (1|Pasture), data = ugr.vs, REML=FALSE)
 summary(forbs_vs_model_ugr)
 anova(forbs_vs_model_ugr)
-lsmeans(forbs_vs_model_ugr, pairwise ~ Herbicide.Treatment*Year, adjust="none",mode="satterthwaite")
 
 
 # Legumes ~ treatment  * as.factor(Year)

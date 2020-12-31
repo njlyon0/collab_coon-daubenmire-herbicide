@@ -13,7 +13,8 @@
 library(ggplot2); library(cowplot) # Plotting
 
 # Set working directory (Also, "Session" menu to "Set Working Directory" works)
-setwd("~/Documents/School/Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
+#setwd("~/Documents/School/Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
+setwd("/cloud/project/")
 
 # Clear environment of other stuff
 rm(list = ls())
@@ -38,8 +39,10 @@ cgr <- subset(sns, sns$Treatment == "GB")
 ugr <- subset(sns, sns$Treatment == "None")
 
 # Plotting shortcuts
-cgr.colors <- c("Con" = "#d73027", "Spr" = "#f46d43", "SnS" = "#fdae61") # shades of red
-ugr.colors <- c("Con" = "#4575b4", "Spr" = "#74add1", "SnS" = "#abd9e9") # shades of blue
+#cgr.colors <- c("Con" = "#d73027", "Spr" = "#f46d43", "SnS" = "#fdae61") # shades of red - draft 1
+cgr.colors <- c("Con" = "#ac261f", "Spr" = "#f77d73", "SnS" = "#fdbb7a") # shades of red
+#ugr.colors <- c("Con" = "#4575b4", "Spr" = "#74add1", "SnS" = "#abd9e9") # shades of blue - draft 1
+ugr.colors <- c("Con" = "#30517d", "Spr" = "#61a2cb", "SnS" = "#bfe2ee") # shades of blue
 dodge <- position_dodge(width = 0.5)
 pref.theme <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                     panel.background = element_blank(), axis.line = element_line(colour = "black"), 

@@ -14,7 +14,8 @@ library(RRPP) # Analysis
 
 # Set working directory (Also, "Session" menu to "Set Working Directory" works)
 setwd("~/Documents/School/Iowa State/Collaborations/'Daubenmire Herbicide Bit/Daubenmire.HerbicideComponent.WD")
-                            
+setwd("/cloud/project/")
+
 # Clear environment of other stuff
 rm(list = ls())
 
