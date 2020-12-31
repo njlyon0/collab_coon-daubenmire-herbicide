@@ -63,7 +63,6 @@ ugr.colors <- c("Con" = "#225ea8", "Spr" = "#1d91c0", "SnS" = "#7fcdbb") # shade
 cgr.colors.vs <-c("14"="#b10026","18"="#feb24c")
 ugr.colors.vs <-c("14"="#225ea8","18"="#7fcdbb")
 
-
 dodge <- position_dodge(width = 0.5)
 pref.theme <- theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                     panel.background = element_blank(), axis.line = element_line(colour = "black"), 
@@ -81,13 +80,16 @@ no.y.axis <- theme(axis.title.y = element_blank(), axis.text.y = element_blank()
   ## CSG
   ## WSG
 
+
 # Get the summary values for Fescue, WSGs, and CSG (not all will be used if year is p>0.1)
+
 cgr.fsc.pltdf <- summarySE(data = cgr, measurevar = "Fescue", groupvars = c("Year", "Herbicide.Treatment"))
 ugr.fsc.pltdf <- summarySE(data = ugr, measurevar = "Fescue", groupvars = c("Year", "Herbicide.Treatment"))
 cgr.wsg.pltdf <- summarySE(data = cgr, measurevar = "WSG", groupvars = c("Year", "Herbicide.Treatment"))
 ugr.wsg.pltdf <- summarySE(data = ugr, measurevar = "WSG", groupvars = c("Year", "Herbicide.Treatment"))
 cgr.csg.pltdf <- summarySE(data = cgr, measurevar = "CSG", groupvars = c("Year", "Herbicide.Treatment"))
 ugr.csg.pltdf <- summarySE(data = ugr, measurevar = "CSG", groupvars = c("Year", "Herbicide.Treatment"))
+
 
 # Pre-treatment fescue plots
 cgr.fsc14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Fescue)) +
@@ -269,7 +271,6 @@ fig.1 <- egg::ggarrange(cgr.fsc14.plt, cgr.fsc.plt, ugr.fsc14.plt, ugr.fsc.plt,
 
 # Save out the larger figure
 ggplot2::ggsave("./Figures/For Manuscript/Figure-1.pdf", width = 7.5, height = 9, units = 'in', plot = fig.1)
-
 ##  --------------------------------------------------------------  ##
                         # Figure 2 -- Photos ####
 ##  --------------------------------------------------------------  ##
@@ -299,7 +300,6 @@ cgr.frb14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Forbs)) +
   ylim(0, 80) +
   labs(x = "Pre-Treatment", y = "Forbs (%)") +
   pref.theme; cgr.frb14.plt
-
 
 ugr.frb14.plt <- ggplot(ugr.14, aes(x = Herbicide.Treatment, y = Avg.Forbs)) +
   geom_errorbar(aes(ymax = Avg.Forbs + SE.Forbs, ymin = Avg.Forbs - SE.Forbs, color = Herbicide.Treatment),
@@ -336,6 +336,7 @@ ugr.frb.plt <- ggplot(ugr.frb.pltdf, aes(x = Year, y = Forbs, shape = Herbicide.
   ylim(0, 80) +
   labs(x = "Post-Treatment") +
   pref.theme + theme(legend.position = c(0.7, 0.9)) + no.y.axis; ugr.frb.plt
+
 
 # Pre-treatment seedmix graphs
 cgr.smx14.plt <- ggplot(cgr.14, aes(x = Herbicide.Treatment, y = Avg.Seedmix)) +
@@ -395,6 +396,7 @@ fig.2 <- egg::ggarrange(cgr.frb14.plt, cgr.frb.plt, ugr.frb14.plt, ugr.frb.plt,
 # Save out this larger figure
 ggplot2::ggsave("./Figures/For Manuscript/Figure-3.pdf", width = 7.5, height = 6, units = 'in', plot = fig.2)
 
+
 ##  --------------------------------------------------------------  ##
               # Figure 4 -- Grasses '14 vs. '18 ####
 ##  --------------------------------------------------------------  ##
@@ -447,6 +449,7 @@ cgr.vs.csg.plt <- ggplot(cgr.vs, aes(x = Composite.Variable, y = CSG, fill = as.
   #, title = "Grazed") +
   annotate("text", x=3.5,y=60,size=5, label="a") +
   geom_segment(aes(x = 1, xend = 6, y = 55, yend = 55), size=0.9) +
+
   ylim(0, 70) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; cgr.vs.csg.plt
@@ -462,6 +465,7 @@ ugr.vs.csg.plt <- ggplot(ugr.vs, aes(x = Composite.Variable, y = CSG, fill = as.
   annotate("text", x=4,  y=45, size=5, label="c") +
   annotate("text", x=5,  y=25, size=5, label="a") +
   annotate("text", x=6,  y=40,  size=5, label="c") +
+
   ylim(0, 70) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; ugr.vs.csg.plt
@@ -478,6 +482,7 @@ cgr.vs.wsg.plt <- ggplot(cgr.vs, aes(x = Composite.Variable, y = WSG, fill = as.
   annotate("text", x=4,  y=29, size=5, label="ac") +
   annotate("text", x=5,  y=15, size=5, label="b") +
   annotate("text", x=6,  y=27, size=5, label="c") +
+
   ylim(0, 45) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; cgr.vs.wsg.plt
@@ -490,6 +495,7 @@ ugr.vs.wsg.plt <- ggplot(ugr.vs, aes(x = Composite.Variable, y = WSG, fill = as.
   annotate("text", x=3,y=38,size=5, label="a") +
   geom_segment(aes(x = 1, xend = 5, y = 34, yend = 34), size=0.9) +
   annotate("text", x=6,y=45,size=5, label="b") +
+
  # geom_text(x = 1, y = 45, label = "NS", size = 6) +
   ylim(0, 45) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
@@ -506,6 +512,7 @@ fig.4 <- egg::ggarrange(cgr.vs.fsc.plt, ugr.vs.fsc.plt,
 
 # Save out the larger figure
 ggplot2::ggsave("./Figures/For Manuscript/Figure-4.pdf", width = 7.5, height = 9, units = 'in', plot = fig.4)
+
 
 ##  --------------------------------------------------------------  ##
             # Figure 5 -- Forbs/Seedmix '14 vs. '18 ####
@@ -526,6 +533,7 @@ cgr.vs.frb.plt <- ggplot(cgr.vs, aes(x = Composite.Variable, y = Forbs, fill = a
   annotate("text", x=4,  y=48, size=5, label="c") +
   annotate("text", x=5,  y=27, size=5, label="a") +
   annotate("text", x=6,  y=55, size=5, label="c") +
+
 #  geom_text(x = 2, y = 29, label = "A", size = 6) +
  # geom_segment(aes(x = 1, xend = 3, y = 25, yend = 25)) +
 #  geom_text(x = 5, y = 56, label = "B", size = 6) +
@@ -561,10 +569,10 @@ cgr.vs.smx.plt <- ggplot(cgr.vs, aes(x = Composite.Variable, y = Seedmix, fill =
   annotate("text", x=4,  y=0.19, size=5, label="bc") +
   annotate("text", x=5,  y=0.09, size=5, label="ab") +
   annotate("text", x=6,  y=0.15, size=5, label="c") +
+
   ylim(0, 0.2) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; cgr.vs.smx.plt
-
 
 ugr.vs.smx.plt <- ggplot(ugr.vs, aes(x = Composite.Variable, y = Seedmix, fill = as.factor(Year))) +
   geom_boxplot(outlier.shape = 21) +
@@ -577,6 +585,7 @@ ugr.vs.smx.plt <- ggplot(ugr.vs, aes(x = Composite.Variable, y = Seedmix, fill =
   annotate("text", x=4,  y=0.16, size=5, label="bc") +
   annotate("text", x=5,  y=0.02, size=5, label="a") +
   annotate("text", x=6,  y=0.12, size=5, label="c") +
+
   ylim(0, 0.2) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   pref.theme; ugr.vs.smx.plt
@@ -590,6 +599,7 @@ fig.5 <- egg::ggarrange(cgr.vs.frb.plt, ugr.vs.frb.plt,
 
 # Save out the larger figure
 ggplot2::ggsave("./Figures/For Manuscript/Figure-5.pdf", width = 7.5, height = 6, units = 'in', plot = fig.5)
+
 
 
 
