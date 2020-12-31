@@ -20,8 +20,7 @@ setwd("/cloud/project/")
 
 # Load required libraries
 
-library(lme4); 
-library(lmerTest); library(lsmeans); library(emmeans); library(tidyverse)
+library(lme4); library(lmerTest); library(lsmeans); library(emmeans); library(tidyverse)
 
 ## ----------------------------------- ##
        # Pre-Stats Data Prep ####
@@ -49,7 +48,6 @@ ugr.vs <- subset(sns.vs, sns.vs$Treatment == "None")
 
 cgr.post$year2=(cgr.post$Year-14)
 ugr.post$year2=(ugr.post$Year-14) #recoding year to be 1,2,3,4
-
 
 #determining forb averages for the 25% threshold
 
@@ -199,7 +197,7 @@ anova(seedmix_model_ugr)
 
 
 # Forbs ~ treatment * year
-forb_model_ugr = lm(Forbs ~ Herbicide.Treatment * year2 + (1|Pasture), data = ugr.post, REML=FALSE)
+forb_model_ugr = lmer(Forbs ~ Herbicide.Treatment * Year + (1|Pasture), data = ugr.post, REML=FALSE)
 summary(forb_model_ugr)
 anova(forb_model_ugr)
 lsmeans(forb_model_ugr, pairwise ~ Herbicide.Treatment*year2, adjust="none",mode="satterthwaite")
