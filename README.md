@@ -1,4 +1,4 @@
-# [Using Adaptive Management to Restore Grasslands Invaded by Tall Fescue (_Schedonorus arundinaceus_)]((https://www.sciencedirect.com/science/article/abs/pii/S1550742421000129?casa_token=4hUYfkm3-RcAAAAA:wxQ1-YwOxcii7F3TzLo8FL5uBeMe7QzmKsOHQ0TIM3zYO5m4tARAfLpgVOcLlLVxElm4d4qwrWc))
+# [Using Adaptive Management to Restore Grasslands Invaded by Tall Fescue (_Schedonorus arundinaceus_)](https://www.sciencedirect.com/science/article/abs/pii/S1550742421000129?casa_token=4hUYfkm3-RcAAAAA:wxQ1-YwOxcii7F3TzLo8FL5uBeMe7QzmKsOHQ0TIM3zYO5m4tARAfLpgVOcLlLVxElm4d4qwrWc)
 
 ### Jaime J. Coon, Nicholas J. Lyon, Edward J. Raynor, Diane M. Debinski, James R. Miller, Walter H. Schacht
 
