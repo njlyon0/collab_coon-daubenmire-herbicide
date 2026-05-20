@@ -29,7 +29,7 @@ daub_v02 <- daub_v01 %>%
   dplyr::mutate(row_id = 1:nrow(.), .before = dplyr::everything()) %>% 
   dplyr::mutate(dplyr::across(.cols = dplyr::everything(),
     .fns = as.character)) %>% 
-  tidyr::pivot_longer(cols = Robel.N:Angle_of_O,
+  tidyr::pivot_longer(cols = c(Year, Robel.N:Angle_of_O),
     names_to = "vars", values_to = "values")
 
 # Check for non-numeric characters
@@ -40,7 +40,8 @@ daub_v03 <- daub_v02 %>%
   dplyr::mutate(values = ifelse(test = values %in% c("", " ", "."),
     yes = NA, no = values)) %>% 
   dplyr::mutate(values = as.numeric(values)) %>% 
-  tidyr::pivot_wider(names_from = vars, values_from = values)
+  tidyr::pivot_wider(names_from = vars, values_from = values) %>% 
+  dplyr::relocate(Year, .after = Patch)
 
 # Check structure
 dplyr::glimpse(daub_v03)
@@ -120,12 +121,55 @@ daub_v05 <- daub_v04 %>%
 # Re-check structure
 dplyr::glimpse(daub_v05)
 
+##  ------------------------------------------  ##
+# Fix Seedmix Ambiguity ----
+##  ------------------------------------------  ##
+
+# We only measured prairie violets through 2016
+# From 2017-on, the 'violets' column was used to measure "seedmix % of total"
+daub_v06 <- daub_v05 %>% 
+  dplyr::mutate(seedmix.forbs_binned.perc = ifelse(test = Year >= 2017,
+    yes = prairie.violets_binned.perc, no = NA),
+    .before = seedmix.forbs_binned.perc.of.all.forbs) %>% 
+  dplyr::mutate(prairie.violets_binned.perc = ifelse(Year >= 2017,
+    yes = NA, no = prairie.violets_binned.perc))
+
+# Check structure
+dplyr::glimpse(daub_v06)
+
+##  ------------------------------------------  ##
+# Calculate 'Seedmix % of Total' ----
+##  ------------------------------------------  ##
+
+# From 2014-2017, we only measured seedmix as a percent of forbs
+## but we can back-calculate that now with simple algebra
+daub_v07 <- daub_v06 %>% 
+  dplyr::mutate(seedmix.forbs_binned.perc = ifelse(Year < 2017 & is.na(seedmix.forbs_binned.perc),
+    yes = forbs_binned.perc / seedmix.forbs_binned.perc.of.all.forbs,
+    no = seedmix.forbs_binned.perc)) %>% 
+  dplyr::mutate(seedmix.forbs_binned.perc = dplyr::case_when(
+    seedmix.forbs_binned.perc == Inf ~ 0, # Division by zero artifact
+    seedmix.forbs_binned.perc > 0 & seedmix.forbs_binned.perc <= 1 ~ 1,
+    seedmix.forbs_binned.perc > 1 & seedmix.forbs_binned.perc <= 5 ~ 3,
+    seedmix.forbs_binned.perc > 5 & seedmix.forbs_binned.perc <= 25 ~ 16,
+    seedmix.forbs_binned.perc > 25 & seedmix.forbs_binned.perc <= 50 ~ 38,
+    seedmix.forbs_binned.perc > 50 & seedmix.forbs_binned.perc <= 75 ~ 63,
+    seedmix.forbs_binned.perc > 75 & seedmix.forbs_binned.perc <= 95 ~ 86,
+    seedmix.forbs_binned.perc > 95 & seedmix.forbs_binned.perc <= 100 ~ 98,
+    TRUE ~ NA)) %>% 
+  dplyr::mutate(seedmix.forbs_prop.above.25.perc.cover = ifelse(
+    seedmix.forbs_binned.perc >= 16, yes = 1, no = 0),
+    .after = seedmix.forbs_binned.perc)
+
+# Check structure
+dplyr::glimpse(daub_v07)
+
 ##  ------------------------------------------  ##      
 # Summarize within Patch ----
 ##  ------------------------------------------  ##      
 
 # Summarize within patch (i.e., across quadrats from 2 transects / patch)
-daub_v06 <- daub_v05 %>% 
+daub_v08 <- daub_v07 %>% 
   dplyr::select(-row_id, -Patch, -Pasture_Patch_Year,
     -Pasture_Patch_Year_Transect, -Angle_of_O) %>% 
   dplyr::rename(year = Year,
@@ -139,13 +183,13 @@ daub_v06 <- daub_v05 %>%
   tidyr::pivot_wider()
 
 # Re-check structure
-dplyr::glimpse(daub_v06)
+dplyr::glimpse(daub_v08)
 
 ##  ------------------------------------------  ##      
 # Clarify Panic Grass Data ----
 ##  ------------------------------------------  ##      
 
-daub_v07 <- daub_v06 %>% 
+daub_v09 <- daub_v08 %>% 
   dplyr::mutate(panic.grass_pres.abs = dplyr::case_when(
     Panic > 0 ~ 1,
     is.na(Panic) ~ NA, 
@@ -153,37 +197,38 @@ daub_v07 <- daub_v06 %>%
   dplyr::select(-Panic)
 
 # Check structure
-dplyr::glimpse(daub_v07)
+dplyr::glimpse(daub_v09)
 
 ##  ------------------------------------------  ##      
 # Reorder Columns ----
 ##  ------------------------------------------  ##      
 
 # Reorder remaining columns
-daub_v08 <- daub_v07 %>% 
+daub_v10 <- daub_v09 %>% 
   dplyr::relocate(dplyr::starts_with("robel."), .after = patch) %>% 
-  dplyr::relocate(dplyr::contains(".robel"), .after = robel.west_dm) %>% 
+  dplyr::relocate(dplyr::contains("\\.robel"), .after = robel.west_dm) %>% 
   dplyr::relocate(panic.grass_pres.abs, .after = std.dev.robel_dm) %>% 
   dplyr::relocate(dplyr::starts_with("bare.ground"), dplyr::starts_with("plant.litter"),
     dplyr::contains("season.grass"), dplyr::starts_with("fescue"),
     dplyr::starts_with("sedges"), dplyr::starts_with("woody.plants"),
+    dplyr::starts_with("legumes"),
     dplyr::starts_with("forbs"), dplyr::starts_with("seedmix"),
-    dplyr::starts_with("prairie.violets"), dplyr::starts_with("legumes"),
+    dplyr::starts_with("prairie.violets"),
     .after = panic.grass_pres.abs) %>% 
   dplyr::relocate(litter.depth_cm, .after = std.dev.robel_dm)
   
 # Make sure no columns are lost accidentally
-supportR::diff_check(old = names(daub_v07), new = names(daub_v08))
+supportR::diff_check(old = names(daub_v09), new = names(daub_v10))
 
 # Re-check structure
-dplyr::glimpse(daub_v08)
+dplyr::glimpse(daub_v10)
 
 ##  ------------------------------------------  ##      
 # Export ----
 ##  ------------------------------------------  ##      
 
 # Make one final object
-daub_v99 <- daub_v08
+daub_v99 <- daub_v10
 
 # Check structure
 dplyr::glimpse(daub_v99)
