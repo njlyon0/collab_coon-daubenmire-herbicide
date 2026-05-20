@@ -285,4 +285,8 @@ dplyr::glimpse(qc_v99)
 write.csv(x = qc_v99, row.names = FALSE, na = '',
     file = file.path("data", "01_daub-tidy.csv"))
 
+# Also export pre-summarization raw data
+write.csv(x = qc_v08, row.names = FALSE, na = '',
+  file = file.path("data", "raw", "01_daub-partial-tidy.csv"))
+
 # End ----
