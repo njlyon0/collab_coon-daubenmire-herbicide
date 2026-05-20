@@ -24,6 +24,6 @@ rm(list = ls()); gc()
 
 # Download that file
 googledrive::drive_download(file = drive_raw$id, overwrite = TRUE,
-    path = file.path("data", "raw-data", drive_raw$name))
+    path = file.path("data", "raw", drive_raw$name))
 
 # End ----

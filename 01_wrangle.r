@@ -15,7 +15,7 @@ source("-setup.r")
 rm(list = ls()); gc()
 
 # Load data
-daub_v01 <- read.csv(file = file.path("data", "raw-data", "daubenmire-project_raw-data.csv"))
+daub_v01 <- read.csv(file = file.path("data", "raw", "daubenmire-project_raw-data.csv"))
 
 # Check structure
 dplyr::glimpse(daub_v01)
@@ -190,6 +190,6 @@ dplyr::glimpse(daub_v99)
 
 # Export
 write.csv(x = daub_v99, row.names = FALSE, na = '',
-    file = file.path("data", "tidy-data", "01_daub-tidy.csv"))
+    file = file.path("data", "01_daub-tidy.csv"))
 
 # End ----
