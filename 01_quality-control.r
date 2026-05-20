@@ -165,11 +165,26 @@ qc_v07 <- qc_v06 %>%
 dplyr::glimpse(qc_v07)
 
 ##  ------------------------------------------  ##      
+# Identify 'Heavy' Grass Quadrats ----
+##  ------------------------------------------  ##      
+
+# Identify quadrats above some threshold percentage of grass cover
+qc_v08 <- qc_v07 %>% 
+  dplyr::mutate(
+    cool.season.grass_prop.above.75.perc.cover = ifelse(cool.season.grass_binned.perc > 75, yes = 1, no = 0),
+    warm.season.grass_prop.above.75.perc.cover = ifelse(warm.season.grass_binned.perc > 75, yes = 1, no = 0),
+    fescue_prop.above.75.perc.cover = ifelse(fescue_binned.perc > 75, yes = 1, no = 0),
+    .after = fescue_binned.perc)
+
+# Check structure
+dplyr::glimpse(qc_v08)
+
+##  ------------------------------------------  ##      
 # Summarize within Patch ----
 ##  ------------------------------------------  ##      
 
 # Summarize within patch (i.e., across quadrats from 2 transects / patch)
-qc_v08 <- qc_v07 %>% 
+qc_v09 <- qc_v08 %>% 
   dplyr::select(-row_id, -Patch, -Pasture_Patch_Year,
     -Pasture_Patch_Year_Transect, -Angle_of_O) %>% 
   dplyr::rename(year = Year,
@@ -183,13 +198,13 @@ qc_v08 <- qc_v07 %>%
   tidyr::pivot_wider()
 
 # Re-check structure
-dplyr::glimpse(qc_v08)
+dplyr::glimpse(qc_v09)
 
 ##  ------------------------------------------  ##      
 # Clarify Panic Grass Data ----
 ##  ------------------------------------------  ##      
 
-qc_v09 <- qc_v08 %>% 
+qc_v10 <- qc_v09 %>% 
   dplyr::mutate(panic.grass_pres.abs = dplyr::case_when(
     Panic > 0 ~ 1,
     is.na(Panic) ~ NA, 
@@ -197,14 +212,14 @@ qc_v09 <- qc_v08 %>%
   dplyr::select(-Panic)
 
 # Check structure
-dplyr::glimpse(qc_v09)
+dplyr::glimpse(qc_v10)
 
 ##  ------------------------------------------  ##      
 # Reorder Columns ----
 ##  ------------------------------------------  ##      
 
 # Reorder remaining columns
-qc_v10 <- qc_v09 %>% 
+qc_v11 <- qc_v10 %>% 
   dplyr::relocate(dplyr::starts_with("robel."), .after = patch) %>% 
   dplyr::relocate(dplyr::contains("\\.robel"), .after = robel.west_dm) %>% 
   dplyr::relocate(panic.grass_pres.abs, .after = std.dev.robel_dm) %>% 
@@ -215,20 +230,21 @@ qc_v10 <- qc_v09 %>%
     dplyr::starts_with("forbs"), dplyr::starts_with("seedmix"),
     dplyr::starts_with("prairie.violets"),
     .after = panic.grass_pres.abs) %>% 
+  dplyr::relocate(dplyr::contains("prop.above"), .after = dplyr::everything()) %>% 
   dplyr::relocate(litter.depth_cm, .after = std.dev.robel_dm)
   
 # Make sure no columns are lost accidentally
-supportR::diff_check(old = names(qc_v09), new = names(qc_v10))
+supportR::diff_check(old = names(qc_v10), new = names(qc_v11))
 
 # Re-check structure
-dplyr::glimpse(qc_v10)
+dplyr::glimpse(qc_v11)
 
 ##  ------------------------------------------  ##      
 # Export ----
 ##  ------------------------------------------  ##      
 
 # Make one final object
-qc_v99 <- qc_v10
+qc_v99 <- qc_v11
 
 # Check structure
 dplyr::glimpse(qc_v99)
