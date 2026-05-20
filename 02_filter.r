@@ -54,11 +54,28 @@ sort(unique(sub_v03$treatment_fescue))
 # How many rows are lost?
 message(nrow(sub_v02) - nrow(sub_v03), " rows (", 100 - floor(nrow(sub_v03)/nrow(sub_v02) * 100), "% of total) lost.")
 
+##  ------------------------------------------  ##
+# Year Subset ----
+##  ------------------------------------------  ##
+
+# Subset to only desired years
+sub_v04 <- sub_v03 %>% 
+    dplyr::filter(year >= 2014)
+
+# What sites are lost?
+supportR::diff_check(old = unique(sub_v03$year), new = unique(sub_v04$year))
+
+# What sites are left?
+sort(unique(sub_v04$year))
+
+# How many rows are lost?
+message(nrow(sub_v03) - nrow(sub_v04), " rows (", 100 - floor(nrow(sub_v04)/nrow(sub_v03) * 100), "% of total) lost.")
+
 ##  ------------------------------------------  ## 
 # Export ----
 ##  ------------------------------------------  ## 
 # Make one final object
-sub_v99 <- sub_v03
+sub_v99 <- sub_v04
 
 # Check structure
 dplyr::glimpse(sub_v99)
