@@ -239,13 +239,15 @@ dplyr::glimpse(qc_v11)
 # Attach Indices ----
 ##  ------------------------------------------  ## 
 
-# Read in both indices
+# Read in all indices
 history_v01 <- read.csv(file = file.path("indices", "site-history.csv"))
 burn_v01 <- read.csv(file = file.path("indices", "burn-cohort.csv"))
+sns_v01 <- read.csv(file = file.path("indices", "spray-and-seed-treatments.csv"))
 
 # Check structure
 dplyr::glimpse(history_v01)
 dplyr::glimpse(burn_v01)
+dplyr::glimpse(sns_v01)
 
 # Attach them to the data and do subsequent column tidying
 qc_v12 <- qc_v11 %>% 
@@ -253,6 +255,8 @@ qc_v12 <- qc_v11 %>%
     by = c("year" = "Year", "pasture" = "Pasture", "patch" = "Pasture_patch")) %>% 
   dplyr::left_join(x = ., y = burn_v01,
     by = c("year" = "Year", "patch" = "Pasture_patch", "Pasture_patch_year")) %>% 
+  dplyr::left_join(x = ., y = sns_v01,
+    by = c("patch" = "Patch")) %>% 
   dplyr::select(-Patch, -Pasture_patch_year) %>% 
   dplyr::rename(treatment_fire = FireTreat,
     treatment_herbicide = HerbTreat,
@@ -260,7 +264,9 @@ qc_v12 <- qc_v11 %>%
     grazing_binary = Grazing,
     time.since.fire_years = TSF,
     time.since.herbicide_years = TSH,
-    burn_cohort = Burn_Cohort) %>% 
+    burn_cohort = Burn_Cohort,
+    treatment_fescue = Fescue.Treatment) %>%
+  dplyr::relocate(treatment_fescue, .before = grazing_binary) %>% 
   dplyr::relocate(treatment_fire:burn_cohort, .after = patch)
 
 # Check structure
