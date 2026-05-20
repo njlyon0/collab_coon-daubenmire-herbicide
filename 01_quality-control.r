@@ -15,17 +15,17 @@ source("-setup.r")
 rm(list = ls()); gc()
 
 # Load data
-daub_v01 <- read.csv(file = file.path("data", "raw", "daubenmire-project_raw-data.csv"))
+qc_v01 <- read.csv(file = file.path("data", "raw", "daubenmire-project_raw-data.csv"))
 
 # Check structure
-dplyr::glimpse(daub_v01)
+dplyr::glimpse(qc_v01)
 
 ##  ------------------------------------------  ##
 # Fix Column Class Issues ----
 ##  ------------------------------------------  ##
 
 # Reshape data to get all ostensibly numeric columns into one column
-daub_v02 <- daub_v01 %>% 
+qc_v02 <- qc_v01 %>% 
   dplyr::mutate(row_id = 1:nrow(.), .before = dplyr::everything()) %>% 
   dplyr::mutate(dplyr::across(.cols = dplyr::everything(),
     .fns = as.character)) %>% 
@@ -33,10 +33,10 @@ daub_v02 <- daub_v01 %>%
     names_to = "vars", values_to = "values")
 
 # Check for non-numeric characters
-supportR::num_check(data = daub_v02, col = "values")
+supportR::num_check(data = qc_v02, col = "values")
 
 # Replace problem values and re-reshape back to original format
-daub_v03 <- daub_v02 %>% 
+qc_v03 <- qc_v02 %>% 
   dplyr::mutate(values = ifelse(test = values %in% c("", " ", "."),
     yes = NA, no = values)) %>% 
   dplyr::mutate(values = as.numeric(values)) %>% 
@@ -44,14 +44,14 @@ daub_v03 <- daub_v02 %>%
   dplyr::relocate(Year, .after = Patch)
 
 # Check structure
-dplyr::glimpse(daub_v03)
+dplyr::glimpse(qc_v03)
 
 ##  ------------------------------------------  ##
 # Re-Calculate Robel Information ----
 ##  ------------------------------------------  ##
 
 # Re-calculate average/std. dev of Robel
-robel_v01 <- daub_v03 %>% 
+robel_v01 <- qc_v03 %>% 
   dplyr::select(-Avg_Robel, -SD_Robel) %>% 
   tidyr::pivot_longer(cols = dplyr::starts_with("Robel.")) %>% 
   dplyr::group_by(Pasture_Patch_Year_Transect) %>% 
@@ -63,7 +63,7 @@ robel_v01 <- daub_v03 %>%
 dplyr::glimpse(robel_v01)
 
 # Update Robel data in original dataset
-daub_v04 <- daub_v03 %>%
+qc_v04 <- qc_v03 %>%
   dplyr::select(-Avg_Robel, -SD_Robel) %>% 
   dplyr::rename(robel.north_dm = Robel.N,
     robel.east_dm = Robel.E,
@@ -73,7 +73,7 @@ daub_v04 <- daub_v03 %>%
   dplyr::relocate(dplyr::contains("robel"), .before = WSG)
 
 # Re-check structure
-dplyr::glimpse(daub_v04)
+dplyr::glimpse(qc_v04)
 
 ##  ------------------------------------------  ##
 # Repair Daubenmire Categories ----
@@ -81,7 +81,7 @@ dplyr::glimpse(daub_v04)
 
 # Remaining vegetation categories were quantified as pseudo-categorical percents
 ## Only allowed values are: 0, 1, 3, 16, 38, 63, 86, 98
-veg_v01 <- daub_v04 %>% 
+veg_v01 <- qc_v04 %>% 
   dplyr::select(row_id, Pasture_Patch_Year_Transect, WSG:Litter, Seed_mix) %>% 
   tidyr::pivot_longer(cols = -row_id:-Pasture_Patch_Year_Transect)
 
@@ -114,12 +114,12 @@ veg_v02 <- veg_v01 %>%
 dplyr::glimpse(veg_v02)
 
 # Re-attach to broader daubenmire data
-daub_v05 <- daub_v04 %>% 
+qc_v05 <- qc_v04 %>% 
   dplyr::select(-WSG:-Litter, -Seed_mix) %>% 
   dplyr::left_join(y = veg_v02, by = c("row_id", "Pasture_Patch_Year_Transect"))
 
 # Re-check structure
-dplyr::glimpse(daub_v05)
+dplyr::glimpse(qc_v05)
 
 ##  ------------------------------------------  ##
 # Fix Seedmix Ambiguity ----
@@ -127,7 +127,7 @@ dplyr::glimpse(daub_v05)
 
 # We only measured prairie violets through 2016
 # From 2017-on, the 'violets' column was used to measure "seedmix % of total"
-daub_v06 <- daub_v05 %>% 
+qc_v06 <- qc_v05 %>% 
   dplyr::mutate(seedmix.forbs_binned.perc = ifelse(test = Year >= 2017,
     yes = prairie.violets_binned.perc, no = NA),
     .before = seedmix.forbs_binned.perc.of.all.forbs) %>% 
@@ -135,7 +135,7 @@ daub_v06 <- daub_v05 %>%
     yes = NA, no = prairie.violets_binned.perc))
 
 # Check structure
-dplyr::glimpse(daub_v06)
+dplyr::glimpse(qc_v06)
 
 ##  ------------------------------------------  ##
 # Calculate 'Seedmix % of Total' ----
@@ -143,7 +143,7 @@ dplyr::glimpse(daub_v06)
 
 # From 2014-2017, we only measured seedmix as a percent of forbs
 ## but we can back-calculate that now with simple algebra
-daub_v07 <- daub_v06 %>% 
+qc_v07 <- qc_v06 %>% 
   dplyr::mutate(seedmix.forbs_binned.perc = ifelse(Year < 2017 & is.na(seedmix.forbs_binned.perc),
     yes = forbs_binned.perc / seedmix.forbs_binned.perc.of.all.forbs,
     no = seedmix.forbs_binned.perc)) %>% 
@@ -162,14 +162,14 @@ daub_v07 <- daub_v06 %>%
     .after = seedmix.forbs_binned.perc)
 
 # Check structure
-dplyr::glimpse(daub_v07)
+dplyr::glimpse(qc_v07)
 
 ##  ------------------------------------------  ##      
 # Summarize within Patch ----
 ##  ------------------------------------------  ##      
 
 # Summarize within patch (i.e., across quadrats from 2 transects / patch)
-daub_v08 <- daub_v07 %>% 
+qc_v08 <- qc_v07 %>% 
   dplyr::select(-row_id, -Patch, -Pasture_Patch_Year,
     -Pasture_Patch_Year_Transect, -Angle_of_O) %>% 
   dplyr::rename(year = Year,
@@ -183,13 +183,13 @@ daub_v08 <- daub_v07 %>%
   tidyr::pivot_wider()
 
 # Re-check structure
-dplyr::glimpse(daub_v08)
+dplyr::glimpse(qc_v08)
 
 ##  ------------------------------------------  ##      
 # Clarify Panic Grass Data ----
 ##  ------------------------------------------  ##      
 
-daub_v09 <- daub_v08 %>% 
+qc_v09 <- qc_v08 %>% 
   dplyr::mutate(panic.grass_pres.abs = dplyr::case_when(
     Panic > 0 ~ 1,
     is.na(Panic) ~ NA, 
@@ -197,14 +197,14 @@ daub_v09 <- daub_v08 %>%
   dplyr::select(-Panic)
 
 # Check structure
-dplyr::glimpse(daub_v09)
+dplyr::glimpse(qc_v09)
 
 ##  ------------------------------------------  ##      
 # Reorder Columns ----
 ##  ------------------------------------------  ##      
 
 # Reorder remaining columns
-daub_v10 <- daub_v09 %>% 
+qc_v10 <- qc_v09 %>% 
   dplyr::relocate(dplyr::starts_with("robel."), .after = patch) %>% 
   dplyr::relocate(dplyr::contains("\\.robel"), .after = robel.west_dm) %>% 
   dplyr::relocate(panic.grass_pres.abs, .after = std.dev.robel_dm) %>% 
@@ -218,23 +218,23 @@ daub_v10 <- daub_v09 %>%
   dplyr::relocate(litter.depth_cm, .after = std.dev.robel_dm)
   
 # Make sure no columns are lost accidentally
-supportR::diff_check(old = names(daub_v09), new = names(daub_v10))
+supportR::diff_check(old = names(qc_v09), new = names(qc_v10))
 
 # Re-check structure
-dplyr::glimpse(daub_v10)
+dplyr::glimpse(qc_v10)
 
 ##  ------------------------------------------  ##      
 # Export ----
 ##  ------------------------------------------  ##      
 
 # Make one final object
-daub_v99 <- daub_v10
+qc_v99 <- qc_v10
 
 # Check structure
-dplyr::glimpse(daub_v99)
+dplyr::glimpse(qc_v99)
 
 # Export
-write.csv(x = daub_v99, row.names = FALSE, na = '',
+write.csv(x = qc_v99, row.names = FALSE, na = '',
     file = file.path("data", "01_daub-tidy.csv"))
 
 # End ----
