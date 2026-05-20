@@ -164,10 +164,9 @@ qc_v07 <- qc_v06 %>%
 # Check structure
 dplyr::glimpse(qc_v07)
 
-##  ------------------------------------------  ##      
+##  ------------------------------------------  ## 
 # Identify 'Heavy' Grass Quadrats ----
-##  ------------------------------------------  ##      
-
+##  ------------------------------------------  ## 
 # Identify quadrats above some threshold percentage of grass cover
 qc_v08 <- qc_v07 %>% 
   dplyr::mutate(
@@ -179,10 +178,9 @@ qc_v08 <- qc_v07 %>%
 # Check structure
 dplyr::glimpse(qc_v08)
 
-##  ------------------------------------------  ##      
+##  ------------------------------------------  ## 
 # Summarize within Patch ----
-##  ------------------------------------------  ##      
-
+##  ------------------------------------------  ## 
 # Summarize within patch (i.e., across quadrats from 2 transects / patch)
 qc_v09 <- qc_v08 %>% 
   dplyr::select(-row_id, -Patch, -Pasture_Patch_Year,
@@ -200,10 +198,9 @@ qc_v09 <- qc_v08 %>%
 # Re-check structure
 dplyr::glimpse(qc_v09)
 
-##  ------------------------------------------  ##      
+##  ------------------------------------------  ## 
 # Clarify Panic Grass Data ----
-##  ------------------------------------------  ##      
-
+##  ------------------------------------------  ## 
 qc_v10 <- qc_v09 %>% 
   dplyr::mutate(panic.grass_pres.abs = dplyr::case_when(
     Panic > 0 ~ 1,
@@ -214,10 +211,9 @@ qc_v10 <- qc_v09 %>%
 # Check structure
 dplyr::glimpse(qc_v10)
 
-##  ------------------------------------------  ##      
+##  ------------------------------------------  ##
 # Reorder Columns ----
-##  ------------------------------------------  ##      
-
+##  ------------------------------------------  ## 
 # Reorder remaining columns
 qc_v11 <- qc_v10 %>% 
   dplyr::relocate(dplyr::starts_with("robel."), .after = patch) %>% 
@@ -239,12 +235,42 @@ supportR::diff_check(old = names(qc_v10), new = names(qc_v11))
 # Re-check structure
 dplyr::glimpse(qc_v11)
 
-##  ------------------------------------------  ##      
-# Export ----
-##  ------------------------------------------  ##      
+##  ------------------------------------------  ## 
+# Attach Indices ----
+##  ------------------------------------------  ## 
 
+# Read in both indices
+history_v01 <- read.csv(file = file.path("indices", "site-history.csv"))
+burn_v01 <- read.csv(file = file.path("indices", "burn-cohort.csv"))
+
+# Check structure
+dplyr::glimpse(history_v01)
+dplyr::glimpse(burn_v01)
+
+# Attach them to the data and do subsequent column tidying
+qc_v12 <- qc_v11 %>% 
+  dplyr::left_join(x = ., y = history_v01,
+    by = c("year" = "Year", "pasture" = "Pasture", "patch" = "Pasture_patch")) %>% 
+  dplyr::left_join(x = ., y = burn_v01,
+    by = c("year" = "Year", "patch" = "Pasture_patch", "Pasture_patch_year")) %>% 
+  dplyr::select(-Patch, -Pasture_patch_year) %>% 
+  dplyr::rename(treatment_fire = FireTreat,
+    treatment_herbicide = HerbTreat,
+    treatment_grazing = GrazingTreat,
+    grazing_binary = Grazing,
+    time.since.fire_years = TSF,
+    time.since.herbicide_years = TSH,
+    burn_cohort = Burn_Cohort) %>% 
+  dplyr::relocate(treatment_fire:burn_cohort, .after = patch)
+
+# Check structure
+dplyr::glimpse(qc_v12)
+
+##  ------------------------------------------  ## 
+# Export ----
+##  ------------------------------------------  ## 
 # Make one final object
-qc_v99 <- qc_v11
+qc_v99 <- qc_v12
 
 # Check structure
 dplyr::glimpse(qc_v99)
